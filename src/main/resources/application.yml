@@ -2,35 +2,48 @@ spring:
   application:
     name: bspapeleria-backend
   datasource:
-    url: jdbc:h2:mem:bspapeleria;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${DATABASE_URL:jdbc:h2:mem:bspapeleria;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    driver-class-name: ${DATABASE_DRIVER:org.h2.Driver}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
   h2:
     console:
-      enabled: true
+      enabled: ${H2_CONSOLE_ENABLED:false}
       path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${DDL_AUTO:update}
     show-sql: false
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: ${HIBERNATE_DIALECT:org.hibernate.dialect.H2Dialect}
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 app:
   jwt:
-    secret: BS Papeleria Secret Key Para JWT 2024 - Minimum 256 bits needed
-    expiration: 86400000
+    secret: ${JWT_SECRET:BS Papeleria Secret Key Para JWT 2024 - Minimum 256 bits needed}
+    expiration: ${JWT_EXPIRATION:86400000}
 
 mercadopago:
-  access-token: TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  public-key: TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-  sandbox: true
+  access-token: ${MP_ACCESS_TOKEN:}
+  public-key: ${MP_PUBLIC_KEY:}
+  sandbox: ${MP_SANDBOX:true}
 
 cors:
-  allowed-origins: http://localhost:5173,http://localhost:3000
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  h2:
+    console:
+      enabled: false
