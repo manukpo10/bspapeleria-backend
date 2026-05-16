@@ -36,7 +36,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
-    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:5174}")
+    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:5174,https://bspapeleria-frontend.vercel.app}")
     private String allowedOrigins;
 
     @Bean
