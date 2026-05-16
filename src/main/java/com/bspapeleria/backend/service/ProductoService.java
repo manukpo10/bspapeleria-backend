@@ -23,7 +23,7 @@ public class ProductoService {
 
     @Transactional(readOnly = true)
     public Page<ProductoResponse> getAllProductos(Pageable pageable) {
-        return productoRepository.findAll(pageable).map(this::toResponse);
+        return productoRepository.findByActivoTrue(pageable).map(this::toResponse);
     }
 
     @Transactional(readOnly = true)

@@ -14,11 +14,14 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
 
     Optional<Curso> findBySlug(String slug);
 
+    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags WHERE c.activo = true")
     Page<Curso> findByActivoTrue(Pageable pageable);
 
-    Page<Curso> findByNivelAndActivoTrue(Curso.Nivel nivel, Pageable pageable);
+    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags WHERE c.nivel = :nivel AND c.activo = true")
+    Page<Curso> findByNivelAndActivoTrue(@Param("nivel") Curso.Nivel nivel, Pageable pageable);
 
-    Page<Curso> findByModalidadAndActivoTrue(Curso.Modalidad modalidad, Pageable pageable);
+    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags WHERE c.modalidad = :modalidad AND c.activo = true")
+    Page<Curso> findByModalidadAndActivoTrue(@Param("modalidad") Curso.Modalidad modalidad, Pageable pageable);
 
     @Query("SELECT c FROM Curso c WHERE c.activo = true AND " +
            "(LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
