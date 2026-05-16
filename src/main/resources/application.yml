@@ -2,9 +2,9 @@ spring:
   application:
     name: bspapeleria-backend
   datasource:
-    url: jdbc:postgresql://aws-0.pooler.supabase.com:5432/postgres
-    username: ${DB_USER:postgres.kpnukedjelyfoewpqwpr}
-    password: ${DB_PASSWORD:Penene10...}
+    url: jdbc:postgresql://db.kpnukedjelyfoewpqwpr.supabase.co:5432/postgres
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
