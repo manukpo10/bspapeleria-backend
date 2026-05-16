@@ -2,10 +2,10 @@ spring:
   application:
     name: bspapeleria-backend
   datasource:
-    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/bspapeleria}
+    url: jdbc:postgresql://aws-0.pooler.supabase.com:5432/postgres
+    username: ${DB_USER:postgres.kpnukedjelyfoewpqwpr}
+    password: ${DB_PASSWORD:Penene10...}
     driver-class-name: org.postgresql.Driver
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: ${DDL_AUTO:update}
@@ -24,7 +24,7 @@ server:
 
 app:
   jwt:
-    secret: ${JWT_SECRET:BS Papeleria Secret Key Para JWT 2024 - Minimum 256 bits needed}
+    secret: ${JWT_SECRET:bspapeleria-jwt-secret-2024-production-key-very-long-32chars}
     expiration: ${JWT_EXPIRATION:86400000}
 
 mercadopago:
