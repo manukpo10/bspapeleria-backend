@@ -46,7 +46,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/h2-console/**", "/error").permitAll()
+                .requestMatchers("/api/auth/**", "/h2-console/**", "/error", "/actuator/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/cursos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/cupones/validar", "/api/cupones/{codigo}").permitAll()
