@@ -30,7 +30,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Page<Producto> searchByNombreODescripcion(@Param("search") String search, Pageable pageable);
 
     @Query("SELECT p FROM Producto p WHERE p.activo = true AND " +
-           "(:search IS NULL OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.descripcion) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           "(:search = '' OR LOWER(p.nombre) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(p.descripcion) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
            "(:categorias IS NULL OR p.categoria IN :categorias) AND " +
            "(:minPrice IS NULL OR p.precio >= :minPrice) AND " +
            "(:maxPrice IS NULL OR p.precio <= :maxPrice)")

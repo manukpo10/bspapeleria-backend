@@ -67,7 +67,15 @@ public class ProductoService {
                     .collect(Collectors.toList());
         }
 
-        Page<Producto> resultados = productoRepository.searchWithFilters(search, cats, minPrice, maxPrice, pageable);
+        // If no filters at all, return all active products (avoids null parameter type issues with PostgreSQL)
+        if ((search == null || search.isEmpty()) && (cats == null || cats.isEmpty()) && minPrice == null && maxPrice == null) {
+            return productoRepository.findByActivoTrue(pageable).map(this::toResponse);
+        }
+
+        // Ensure search is empty string if null, to avoid PostgreSQL type inference issues
+        String safeSearch = search == null ? "" : search;
+
+        Page<Producto> resultados = productoRepository.searchWithFilters(safeSearch, cats, minPrice, maxPrice, pageable);
         return resultados.map(this::toResponse);
     }
 
