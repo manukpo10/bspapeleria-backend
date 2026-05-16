@@ -31,7 +31,7 @@ mercadopago.access-token=${MP_ACCESS_TOKEN:}
 mercadopago.public-key=${MP_PUBLIC_KEY:}
 mercadopago.sandbox=${MP_SANDBOX:true}
 
-# CORS - Origins
+# CORS
 cors.allowed-origins=${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,https://bspapeleria-frontend.vercel.app}
 
 # Management endpoints
