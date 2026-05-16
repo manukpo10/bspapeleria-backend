@@ -2,7 +2,7 @@ spring:
   application:
     name: bspapeleria-backend
   datasource:
-    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:6543/postgres?sslmode=require
+    url: jdbc:postgresql://db.kpnukedjelyfoewpqwpr.supabase.co:5432/postgres?sslmode=require
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -14,8 +14,6 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          prepare_threshold: 0
     open-in-view: false
   jackson:
     serialization:
