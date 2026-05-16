@@ -1,45 +1,42 @@
-spring:
-  application:
-    name: bspapeleria-backend
-  datasource:
-    url: jdbc:postgresql://db.kpnukedjelyfoewpqwpr.supabase.co:5432/postgres?sslmode=require
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: false
-  jackson:
-    serialization:
-      fail-on-empty-beans: false
+# Configuración del servidor
+server.port=${PORT:8080}
 
-server:
-  port: ${PORT:8080}
+# Conexión al pooler de Supabase
+# Pooler tiene límite de 15 conexiones - usar solo 1 para no saturarlo
+spring.datasource.url=jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
+spring.datasource.driver-class-name=org.postgresql.Driver
 
-app:
-  jwt:
-    secret: ${JWT_SECRET:bspapeleria-jwt-secret-2024-production-key-very-long-32chars}
-    expiration: ${JWT_EXPIRATION:86400000}
+# HikariCP - solo 1 conexión para no saturar el pooler (límite 15)
+spring.datasource.hikari.maximum-pool-size=1
+spring.datasource.hikari.minimum-idle=1
+spring.datasource.hikari.connection-timeout=30000
+spring.datasource.hikari.idle-timeout=600000
+spring.datasource.hikari.max-lifetime=1800000
 
-mercadopago:
-  access-token: ${MP_ACCESS_TOKEN:}
-  public-key: ${MP_PUBLIC_KEY:}
-  sandbox: ${MP_SANDBOX:true}
+# Configuración de JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=create
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.application.name=bspapeleria-backend
+
+# JWT
+app.jwt.secret=${JWT_SECRET:bspapeleria-jwt-secret-2024-production-key-very-long-32chars}
+app.jwt.expiration=${JWT_EXPIRATION:86400000}
+
+# Mercado Pago
+mercadopago.access-token=${MP_ACCESS_TOKEN:}
+mercadopago.public-key=${MP_PUBLIC_KEY:}
+mercadopago.sandbox=${MP_SANDBOX:true}
 
 # CORS
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,https://bspapeleria-frontend.vercel.app}
+cors.allowed-origins=${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000,https://bspapeleria-frontend.vercel.app}
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      allowed: "*"
+# Management endpoints
+management.endpoints.web.exposure.include=health,info
+management.endpoint.health.allowed=*
+
+spring.jackson.serialization.fail-on-empty-beans=false
+spring.jpa.open-in-view=false
