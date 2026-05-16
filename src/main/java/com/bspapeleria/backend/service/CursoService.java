@@ -64,7 +64,11 @@ public class CursoService {
 
     @Transactional(readOnly = true)
     public Page<CursoResponse> searchCursos(String search, Pageable pageable) {
-        return cursoRepository.searchCursos(search, pageable).map(this::toResponse);
+        String safeSearch = (search == null) ? "" : search;
+        if (safeSearch.isEmpty()) {
+            return cursoRepository.findByActivoTrue(pageable).map(this::toResponse);
+        }
+        return cursoRepository.searchCursos(safeSearch, pageable).map(this::toResponse);
     }
 
     @Transactional(readOnly = true)
