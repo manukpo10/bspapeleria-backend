@@ -14,8 +14,6 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          prepare_threshold: 0
     open-in-view: false
   jackson:
     serialization:
