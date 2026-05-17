@@ -45,6 +45,7 @@ public class AdminController {
 
     @GetMapping("/stats")
     @PreAuthorize("hasRole('ADMIN')")
+    @Transactional(readOnly = true)
     public ResponseEntity<java.util.Map<String, Object>> getAdminStats() {
         List<Orden> ordenes = ordenRepository.findAll();
         double totalSales = ordenes.stream()
