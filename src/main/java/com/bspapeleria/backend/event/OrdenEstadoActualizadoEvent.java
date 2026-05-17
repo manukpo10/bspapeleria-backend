@@ -1,18 +1,17 @@
 package com.bspapeleria.backend.event;
 
-import com.bspapeleria.backend.entity.Orden;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 @Getter
 public class OrdenEstadoActualizadoEvent extends ApplicationEvent {
 
-    private final Orden orden;
+    private final Long ordenId;
     private final String estadoAnterior;
 
-    public OrdenEstadoActualizadoEvent(Object source, Orden orden, String estadoAnterior) {
+    public OrdenEstadoActualizadoEvent(Object source, Long ordenId, String estadoAnterior) {
         super(source);
-        this.orden = orden;
+        this.ordenId = ordenId;
         this.estadoAnterior = estadoAnterior;
     }
 }

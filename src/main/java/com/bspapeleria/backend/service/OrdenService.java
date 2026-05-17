@@ -172,7 +172,7 @@ public class OrdenService {
         orden.setEstado(estadoEnum);
         ordenRepository.save(orden);
 
-        eventPublisher.publishEvent(new OrdenEstadoActualizadoEvent(this, orden, estadoAnteriorStr));
+        eventPublisher.publishEvent(new OrdenEstadoActualizadoEvent(this, orden.getId(), estadoAnteriorStr));
 
         return toResponse(orden);
     }

@@ -24,7 +24,7 @@ public class OrdenEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleOrdenEstadoActualizado(OrdenEstadoActualizadoEvent event) {
-        Long ordenId = event.getOrden().getId();
+        Long ordenId = event.getOrdenId();
         Orden orden = ordenRepository.findById(ordenId)
                 .orElseThrow(() -> new RuntimeException("Orden no encontrada: " + ordenId));
 
