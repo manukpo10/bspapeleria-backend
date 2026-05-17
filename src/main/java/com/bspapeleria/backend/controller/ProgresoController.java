@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class ProgresoController {
 
     @GetMapping
     @PreAuthorize("hasRole('CLIENTE')")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<ProgresoResponse>> getMyProgresos(@AuthenticationPrincipal UserDetails userDetails) {
         Long usuarioId = extractUsuarioId(userDetails);
         return ResponseEntity.ok(progresoService.getProgresosByUsuario(usuarioId));
@@ -31,6 +33,7 @@ public class ProgresoController {
 
     @GetMapping("/{cursoId}")
     @PreAuthorize("hasRole('CLIENTE')")
+    @Transactional(readOnly = true)
     public ResponseEntity<ProgresoResponse> getMiProgresoDelCurso(
             @PathVariable Long cursoId,
             @AuthenticationPrincipal UserDetails userDetails) {

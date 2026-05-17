@@ -18,3 +18,5 @@ logs/
 *.bak
 *.swp
 *~
+# Engram AI agent memory
+.engram/
