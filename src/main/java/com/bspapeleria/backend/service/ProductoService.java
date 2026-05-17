@@ -87,9 +87,9 @@ public class ProductoService {
                 .descripcionCorta(request.getDescripcionCorta())
                 .precio(request.getPrecio())
                 .precioComparacion(request.getPrecioComparacion())
-                .imagenes(request.getImagenes())
+                .imagenes(request.getImagenes() != null ? new java.util.HashSet<>(request.getImagenes()) : null)
                 .categoria(parseCategoria(request.getCategoria()))
-                .tags(request.getTags())
+                .tags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null)
                 .stock(request.getStock())
                 .esDigital(request.getEsDigital() != null ? request.getEsDigital() : false)
                 .urlDescarga(request.getUrlDescarga())
@@ -112,9 +112,9 @@ public class ProductoService {
         producto.setDescripcionCorta(request.getDescripcionCorta());
         producto.setPrecio(request.getPrecio());
         producto.setPrecioComparacion(request.getPrecioComparacion());
-        producto.setImagenes(request.getImagenes());
+        producto.setImagenes(request.getImagenes() != null ? new java.util.HashSet<>(request.getImagenes()) : null);
         producto.setCategoria(parseCategoria(request.getCategoria()));
-        producto.setTags(request.getTags());
+        producto.setTags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null);
         producto.setStock(request.getStock());
         producto.setEsDigital(request.getEsDigital() != null ? request.getEsDigital() : false);
         producto.setUrlDescarga(request.getUrlDescarga());
