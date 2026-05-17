@@ -3,10 +3,12 @@ package com.bspapeleria.backend.listener;
 import com.bspapeleria.backend.entity.Orden;
 import com.bspapeleria.backend.entity.OrdenDetalle;
 import com.bspapeleria.backend.event.OrdenEstadoActualizadoEvent;
+import com.bspapeleria.backend.repository.OrdenRepository;
 import com.bspapeleria.backend.service.ProgresoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -17,11 +19,15 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class OrdenEventListener {
 
     private final ProgresoService progresoService;
+    private final OrdenRepository ordenRepository;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleOrdenEstadoActualizado(OrdenEstadoActualizadoEvent event) {
-        Orden orden = event.getOrden();
+        Long ordenId = event.getOrden().getId();
+        Orden orden = ordenRepository.findById(ordenId)
+                .orElseThrow(() -> new RuntimeException("Orden no encontrada: " + ordenId));
+
         Orden.Estado nuevoEstado = orden.getEstado();
 
         if (nuevoEstado == Orden.Estado.CONFIRMADA || nuevoEstado == Orden.Estado.ENTREGADA) {
