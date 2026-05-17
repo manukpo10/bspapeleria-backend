@@ -7,6 +7,7 @@ import com.bspapeleria.backend.repository.OrdenRepository;
 import com.bspapeleria.backend.service.ProgresoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ public class OrdenEventListener {
     private final ProgresoService progresoService;
     private final OrdenRepository ordenRepository;
 
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleOrdenEstadoActualizado(OrdenEstadoActualizadoEvent event) {
