@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -94,9 +94,9 @@ public class ProductDataLoader implements CommandLineRunner {
                 .descripcionCorta(descripcion.length() > 100 ? descripcion.substring(0, 100) + "..." : descripcion)
                 .precio(precio)
                 .precioComparacion(precio * 1.2)
-                .imagenes(List.of("https://picsum.photos/seed/" + slug + "/400/400"))
+                .imagenes(Set.of("https://picsum.photos/seed/" + slug + "/400/400"))
                 .categoria(categoria)
-                .tags(List.of(nombre.toLowerCase(), "papeleria"))
+                .tags(Set.of(nombre.toLowerCase(), "papeleria"))
                 .stock(stock)
                 .esDigital(false)
                 .activo(true)
