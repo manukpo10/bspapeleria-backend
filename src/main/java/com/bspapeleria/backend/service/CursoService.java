@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,11 +90,11 @@ public class CursoService {
                 .instructor(request.getInstructor())
                 .duracionHoras(request.getDuracionHoras())
                 .urlVideoIntro(request.getUrlVideoIntro())
-                .tags(request.getTags())
+                .tags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null)
                 .build();
 
         if (request.getLecciones() != null && !request.getLecciones().isEmpty()) {
-            List<Leccion> lecciones = request.getLecciones().stream()
+            Set<Leccion> lecciones = request.getLecciones().stream()
                     .map(lr -> Leccion.builder()
                             .curso(curso)
                             .titulo(lr.getTitulo())
@@ -104,7 +105,7 @@ public class CursoService {
                             .duracionMinutos(lr.getDuracionMinutos() != null ? lr.getDuracionMinutos() : 0)
                             .esPreview(lr.getEsPreview() != null ? lr.getEsPreview() : false)
                             .build())
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
             curso.setLecciones(lecciones);
         }
 
@@ -127,11 +128,11 @@ public class CursoService {
         curso.setInstructor(request.getInstructor());
         curso.setDuracionHoras(request.getDuracionHoras());
         curso.setUrlVideoIntro(request.getUrlVideoIntro());
-        curso.setTags(request.getTags());
+        curso.setTags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null);
 
         if (request.getLecciones() != null) {
             curso.getLecciones().clear();
-            List<Leccion> lecciones = request.getLecciones().stream()
+            Set<Leccion> lecciones = request.getLecciones().stream()
                     .map(lr -> Leccion.builder()
                             .curso(curso)
                             .titulo(lr.getTitulo())
@@ -142,7 +143,7 @@ public class CursoService {
                             .duracionMinutos(lr.getDuracionMinutos() != null ? lr.getDuracionMinutos() : 0)
                             .esPreview(lr.getEsPreview() != null ? lr.getEsPreview() : false)
                             .build())
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
             curso.getLecciones().addAll(lecciones);
         }
 
