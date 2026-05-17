@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface CursoRepository extends JpaRepository<Curso, Long> {
 
-    Optional<Curso> findBySlug(String slug);
+    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags LEFT JOIN FETCH c.lecciones WHERE c.slug = :slug AND c.activo = true")
+    Optional<Curso> findBySlug(@Param("slug") String slug);
 
     @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags WHERE c.activo = true")
     Page<Curso> findByActivoTrue(Pageable pageable);
@@ -23,13 +24,13 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
     @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags WHERE c.modalidad = :modalidad AND c.activo = true")
     Page<Curso> findByModalidadAndActivoTrue(@Param("modalidad") Curso.Modalidad modalidad, Pageable pageable);
 
-    @Query("SELECT c FROM Curso c WHERE c.activo = true AND " +
+    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags WHERE c.activo = true AND " +
            "(LOWER(c.titulo) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(c.descripcion) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(c.instructor) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Curso> searchCursos(@Param("search") String search, Pageable pageable);
 
-    @Query("SELECT c FROM Curso c WHERE c.activo = true AND c.precio >= :minPrice AND c.precio <= :maxPrice")
+    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags WHERE c.activo = true AND c.precio >= :minPrice AND c.precio <= :maxPrice")
     Page<Curso> findByPrecioRange(@Param("minPrice") Double minPrice, @Param("maxPrice") Double maxPrice, Pageable pageable);
 
     boolean existsBySlug(String slug);
