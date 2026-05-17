@@ -116,8 +116,8 @@ public class CourseDataLoader implements CommandLineRunner {
                 .modalidad(modalidad)
                 .instructor(instructor)
                 .duracionHoras(duracionHoras)
-                .tags(tags)
-                .lecciones(lecciones)
+                .tags(tags != null ? new java.util.HashSet<>(tags) : null)
+                .lecciones(lecciones != null ? new java.util.HashSet<>(lecciones) : null)
                 .estudiantesCount((int) (Math.random() * 100))
                 .rating(3.5 + Math.round(Math.random() * 15) / 10.0)
                 .build();

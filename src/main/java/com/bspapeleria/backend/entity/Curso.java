@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "cursos")
@@ -61,13 +63,13 @@ public class Curso {
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("orden ASC")
     @Builder.Default
-    private List<Leccion> lecciones = new ArrayList<>();
+    private Set<Leccion> lecciones = new HashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "curso_tags", joinColumns = @JoinColumn(name = "curso_id"))
     @Column(name = "tag")
     @Builder.Default
-    private List<String> tags = new ArrayList<>();
+    private Set<String> tags = new HashSet<>();
 
     @Column(nullable = false)
     private LocalDateTime fechaCreacion;

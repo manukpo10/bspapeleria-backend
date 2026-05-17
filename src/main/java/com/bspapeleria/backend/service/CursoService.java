@@ -209,7 +209,7 @@ public class CursoService {
                 .activo(curso.getActivo())
                 .estudiantesCount(curso.getEstudiantesCount())
                 .rating(curso.getRating())
-                .tags(curso.getTags())
+                .tags(curso.getTags() != null ? new java.util.ArrayList<>(curso.getTags()) : null)
                 .lecciones(lecciones)
                 .createdAt(curso.getFechaCreacion())
                 .build();
