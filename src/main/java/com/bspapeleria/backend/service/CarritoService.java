@@ -133,13 +133,13 @@ public class CarritoService {
                         nombre = productoRepository.findById(Long.parseLong(item.getItemId()))
                                 .map(p -> {
                                     String nom = p.getNombre();
-                                    String img = (p.getImagenes() != null && !p.getImagenes().isEmpty()) ? p.getImagenes().get(0) : "";
+                                    String img = (p.getImagenes() != null && !p.getImagenes().isEmpty()) ? p.getImagenes().iterator().next() : "";
                                     return nom + "|" + img;
                                 })
                                 .orElse("")
                                 .split("\\|")[0];
                         imagenUrl = productoRepository.findById(Long.parseLong(item.getItemId()))
-                                .map(p -> (p.getImagenes() != null && !p.getImagenes().isEmpty()) ? p.getImagenes().get(0) : "")
+                                .map(p -> (p.getImagenes() != null && !p.getImagenes().isEmpty()) ? p.getImagenes().iterator().next() : "")
                                 .orElse("");
                     } else {
                         nombre = cursoRepository.findById(Long.parseLong(item.getItemId()))

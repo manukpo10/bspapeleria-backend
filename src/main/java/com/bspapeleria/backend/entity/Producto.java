@@ -3,7 +3,7 @@ package com.bspapeleria.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "productos")
@@ -36,7 +36,7 @@ public class Producto {
     @ElementCollection
     @CollectionTable(name = "producto_imagenes", joinColumns = @JoinColumn(name = "producto_id"))
     @Column(name = "imagen")
-    private List<String> imagenes;
+    private Set<String> imagenes;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -45,7 +45,7 @@ public class Producto {
     @ElementCollection
     @CollectionTable(name = "producto_tags", joinColumns = @JoinColumn(name = "producto_id"))
     @Column(name = "tag")
-    private List<String> tags;
+    private Set<String> tags;
 
     @Column(nullable = false)
     private Integer stock = 0;

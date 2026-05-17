@@ -92,7 +92,7 @@ public class OrdenService {
                         .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado: " + item.getItemId()));
                 nombreItem = producto.getNombre();
                 imagenUrl = producto.getImagenes() != null && !producto.getImagenes().isEmpty()
-                        ? producto.getImagenes().get(0) : null;
+                        ? producto.getImagenes().iterator().next() : null;
                 precioUnitario = producto.getPrecio();
             } else {
                 Curso curso = cursoRepository.findById(Long.parseLong(item.getItemId()))
