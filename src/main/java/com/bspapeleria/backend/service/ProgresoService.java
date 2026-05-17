@@ -11,6 +11,7 @@ import com.bspapeleria.backend.repository.CursoRepository;
 import com.bspapeleria.backend.repository.ProgresoRepository;
 import com.bspapeleria.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProgresoService {
 
     private final ProgresoRepository progresoRepository;
@@ -41,7 +43,9 @@ public class ProgresoService {
 
     @Transactional
     public ProgresoResponse inscribirUsuario(Long usuarioId, Long cursoId) {
+        log.info("inscribirUsuario: usuarioId={}, cursoId={}", usuarioId, cursoId);
         if (progresoRepository.existsByUsuarioIdAndCursoId(usuarioId, cursoId)) {
+            log.info("inscribirUsuario: Progreso ya existe para usuario {} y curso {}", usuarioId, cursoId);
             return toResponse(progresoRepository.findByUsuarioIdAndCursoId(usuarioId, cursoId)
                     .orElseThrow(() -> new ResourceNotFoundException("Progreso no encontrado")));
         }
