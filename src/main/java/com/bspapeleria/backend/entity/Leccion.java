@@ -7,7 +7,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "lecciones")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
