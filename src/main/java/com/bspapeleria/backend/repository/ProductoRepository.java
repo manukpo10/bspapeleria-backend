@@ -18,13 +18,10 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     boolean existsBySlug(String slug);
 
-    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.imagenes LEFT JOIN FETCH p.tags WHERE p.activo = true")
     Page<Producto> findByActivoTrue(Pageable pageable);
 
-    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.imagenes LEFT JOIN FETCH p.tags WHERE p.activo = true AND p.categoria = :categoria")
-    Page<Producto> findByCategoriaAndActivoTrue(@Param("categoria") Categoria categoria, Pageable pageable);
+    Page<Producto> findByCategoriaAndActivoTrue(Categoria categoria, Pageable pageable);
 
-    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.imagenes LEFT JOIN FETCH p.tags WHERE p.destacado = true AND p.activo = true")
     Page<Producto> findByDestacadoTrueAndActivoTrue(Pageable pageable);
 
     @Query("SELECT p FROM Producto p WHERE p.activo = true AND " +
