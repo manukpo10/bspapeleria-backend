@@ -1,10 +1,13 @@
 package com.bspapeleria.backend.controller;
 
+import com.bspapeleria.backend.dto.CursoRequest;
+import com.bspapeleria.backend.dto.CursoResponse;
 import com.bspapeleria.backend.dto.UsuarioResponse;
 import com.bspapeleria.backend.entity.Orden;
 import com.bspapeleria.backend.entity.Usuario;
 import com.bspapeleria.backend.exception.BadRequestException;
 import com.bspapeleria.backend.repository.*;
+import com.bspapeleria.backend.service.CursoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +27,7 @@ public class AdminController {
     private final UsuarioRepository usuarioRepository;
     private final OrdenRepository ordenRepository;
     private final CursoRepository cursoRepository;
+    private final CursoService cursoService;
 
     @GetMapping("/usuarios")
     @PreAuthorize("hasRole('ADMIN')")
@@ -96,5 +100,11 @@ public class AdminController {
                 .activo(usuario.getActivo())
                 .fechaCreacion(usuario.getFechaCreacion())
                 .build();
+    }
+
+    @PostMapping("/cursos/bulk")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CursoResponse> createCursoWithLecciones(@RequestBody CursoRequest request) {
+        return ResponseEntity.ok(cursoService.createCurso(request));
     }
 }
