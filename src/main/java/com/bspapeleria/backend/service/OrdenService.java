@@ -27,6 +27,7 @@ public class OrdenService {
     private final CursoRepository cursoRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final ProgresoService progresoService;
+    private final CuponService cuponService;
 
     @Transactional(readOnly = true)
     public Page<OrdenResponse> getOrdenesByUsuario(Long usuarioId, Pageable pageable) {
@@ -179,36 +180,60 @@ public class OrdenService {
 
     @Transactional
     public void actualizarEstadoPagoMercadoPago(String preferenceId, String paymentId, String status) {
-        List<Orden> ordenes = ordenRepository.findAll();
-        for (Orden orden : ordenes) {
-            if (orden.getMercadoPagoPreferenceId() != null &&
-                orden.getMercadoPagoPreferenceId().equals(preferenceId)) {
+        Orden orden = ordenRepository.findByMercadoPagoPreferenceId(preferenceId)
+                .orElse(null);
 
-                orden.setMercadoPagoPaymentId(paymentId);
-
-                if ("approved".equalsIgnoreCase(status)) {
-                    orden.setEstadoPago(Orden.EstadoPago.APROBADO);
-                    orden.setEstado(Orden.Estado.CONFIRMADA);
-                } else if ("rejected".equalsIgnoreCase(status)) {
-                    orden.setEstadoPago(Orden.EstadoPago.RECHAZADO);
-                } else if ("pending".equalsIgnoreCase(status)) {
-                    orden.setEstadoPago(Orden.EstadoPago.PENDIENTE);
-                } else if ("refunded".equalsIgnoreCase(status)) {
-                    orden.setEstadoPago(Orden.EstadoPago.REEMBOLSADO);
-                    orden.setEstado(Orden.Estado.CANCELADA);
-                }
-
-                ordenRepository.save(orden);
-                return;
-            }
+        if (orden == null) {
+            return;
         }
+
+        orden.setMercadoPagoPaymentId(paymentId);
+
+        if ("approved".equalsIgnoreCase(status)) {
+            orden.setEstadoPago(Orden.EstadoPago.APROBADO);
+            orden.setEstado(Orden.Estado.CONFIRMADA);
+        } else if ("rejected".equalsIgnoreCase(status)) {
+            orden.setEstadoPago(Orden.EstadoPago.RECHAZADO);
+        } else if ("pending".equalsIgnoreCase(status)) {
+            orden.setEstadoPago(Orden.EstadoPago.PENDIENTE);
+        } else if ("refunded".equalsIgnoreCase(status)) {
+            orden.setEstadoPago(Orden.EstadoPago.REEMBOLSADO);
+            orden.setEstado(Orden.Estado.CANCELADA);
+        }
+
+        ordenRepository.save(orden);
     }
 
     private double calcularDescuento(double subtotal, String codigoCupon) {
-        if ("DESCUENTO10".equalsIgnoreCase(codigoCupon)) {
-            return subtotal * 0.10;
+        try {
+            Cupon cupon = cuponService.findCuponByCodigo(codigoCupon).orElse(null);
+            if (cupon == null) {
+                return 0.0;
+            }
+
+            if (!cupon.getActivo()) {
+                return 0.0;
+            }
+
+            if (cupon.getFechaVencimiento() != null &&
+                cupon.getFechaVencimiento().isBefore(java.time.LocalDateTime.now())) {
+                return 0.0;
+            }
+
+            if (cupon.getUsosCount() >= cupon.getMaxUsos()) {
+                return 0.0;
+            }
+
+            if (cupon.getTipoDescuento() == Cupon.TipoDescuento.PORCENTAJE) {
+                return subtotal * (cupon.getValorDescuento() / 100.0);
+            } else if (cupon.getTipoDescuento() == Cupon.TipoDescuento.MONTO_FIJO) {
+                return Math.min(cupon.getValorDescuento(), subtotal);
+            }
+
+            return 0.0;
+        } catch (Exception e) {
+            return 0.0;
         }
-        return 0.0;
     }
 
     private Orden.MetodoPago parseMetodoPago(String metodo) {

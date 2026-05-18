@@ -3,6 +3,7 @@ package com.bspapeleria.backend.controller;
 import com.bspapeleria.backend.dto.UsuarioResponse;
 import com.bspapeleria.backend.entity.Orden;
 import com.bspapeleria.backend.entity.Usuario;
+import com.bspapeleria.backend.exception.BadRequestException;
 import com.bspapeleria.backend.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -12,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -39,7 +41,13 @@ public class AdminController {
             @RequestParam String rol) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + id));
-        usuario.setRol(Usuario.Rol.valueOf(rol.toUpperCase()));
+
+        String rolUpper = rol.toUpperCase();
+        if (Arrays.stream(Usuario.Rol.values()).noneMatch(r -> r.name().equals(rolUpper))) {
+            throw new BadRequestException("Rol inválido. Valores válidos: ADMIN, CLIENTE");
+        }
+
+        usuario.setRol(Usuario.Rol.valueOf(rolUpper));
         usuarioRepository.save(usuario);
         return ResponseEntity.ok(toResponse(usuario));
     }

@@ -23,4 +23,6 @@ public interface OrdenRepository extends JpaRepository<Orden, Long> {
 
     @Query("SELECT COUNT(o) FROM Orden o WHERE o.usuario.id = :usuarioId AND o.estadoPago = 'APROBADO'")
     long countCompletedOrdersByUsuario(@Param("usuarioId") Long usuarioId);
+
+    Optional<Orden> findByMercadoPagoPreferenceId(String preferenceId);
 }

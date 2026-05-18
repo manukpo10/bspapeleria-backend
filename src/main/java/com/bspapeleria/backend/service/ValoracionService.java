@@ -98,6 +98,7 @@ public class ValoracionService {
         } else if ("CURSO".equals(entidadTipo)) {
             cursoRepository.findById(entidadId).ifPresent(curso -> {
                 curso.setRating(promedio != null ? promedio : 0.0);
+                curso.setEstudiantesCount(count);
                 cursoRepository.save(curso);
             });
         }

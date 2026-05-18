@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,11 @@ public class CuponService {
     @Transactional(readOnly = true)
     public Page<CuponResponse> getAllCupones(Pageable pageable) {
         return cuponRepository.findAll(pageable).map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Cupon> findCuponByCodigo(String codigo) {
+        return cuponRepository.findByCodigoIgnoreCase(codigo);
     }
 
     @Transactional(readOnly = true)
