@@ -85,6 +85,7 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public UsuarioResponse getCurrentUser(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new BadRequestException("Usuario no encontrado"));
@@ -107,7 +108,7 @@ public class AuthService {
     }
 
     private UsuarioResponse toResponse(Usuario usuario) {
-        List<com.bspapeleria.backend.entity.Progreso> progresos = progresoRepository.findByUsuarioId(usuario.getId());
+        List<com.bspapeleria.backend.entity.Progreso> progresos = progresoRepository.findByUsuarioIdWithLecciones(usuario.getId());
         List<EnrollmentResponse> enrollments = progresos.stream()
                 .map(this::toEnrollmentResponse)
                 .collect(java.util.stream.Collectors.toList());
