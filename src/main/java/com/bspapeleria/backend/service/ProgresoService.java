@@ -29,14 +29,14 @@ public class ProgresoService {
 
     @Transactional(readOnly = true)
     public List<ProgresoResponse> getProgresosByUsuario(Long usuarioId) {
-        return progresoRepository.findByUsuarioId(usuarioId).stream()
+        return progresoRepository.findByUsuarioIdWithLecciones(usuarioId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public ProgresoResponse getProgresoByUsuarioAndCurso(Long usuarioId, Long cursoId) {
-        Progreso progreso = progresoRepository.findByUsuarioIdAndCursoId(usuarioId, cursoId)
+        Progreso progreso = progresoRepository.findByUsuarioIdAndCursoIdWithLecciones(usuarioId, cursoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Progreso no encontrado para este curso"));
         return toResponse(progreso);
     }
