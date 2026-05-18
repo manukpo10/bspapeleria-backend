@@ -8,8 +8,9 @@ import com.bspapeleria.backend.entity.Curso.Modalidad;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -19,12 +20,12 @@ public class CourseDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // NOTE: allowing re-run to support adding new courses — slug UNIQUE constraint prevents duplicates
-        // if (cursoRepository.count() > 0) {
-        //     return;
-        // }
+        // Get existing slugs so we only add new courses, never overwrite
+        Set<String> existingSlugs = cursoRepository.findAll().stream()
+                .map(Curso::getSlug)
+                .collect(Collectors.toSet());
 
-        List<Curso> cursos = List.of(
+        List<Curso> allCursos = List.of(
             crearCurso(
                 "candy-bar-powerpoint",
                 "Candy Bar en PowerPoint",
@@ -86,7 +87,7 @@ public class CourseDataLoader implements CommandLineRunner {
                     crearLeccion("Kerning y tracking", "Técnicas de ajuste visual entre letras. Cómo hacer que el texto fluya naturalmente.", null, 10, false),
                     crearLeccion("Composición de frases", "Armar palabras y frases completas. Ejercicios con quotes cortos y medianas longitudes.", "https://www.youtube.com/watch?v=ejemplo13", 20, false),
                     crearLeccion("Estilo boho chic", "Aprendé el estilo libre y orgánico. Flourishes, hojas y elementos naturales en compositions.", null, 14, false),
-                    crearLeccion("Digitalizar lettering", "Cómo escanear o fotografiar trabajos اليدوي. Vectorización básica en Illustrator o Vectorizer.", null, 12, false),
+                    crearLeccion("Digitalizar lettering", "Cómo escanear o fotografiar trabajos manuales. Vectorización básica en Illustrator o Vectorizer.", null, 12, false),
                     crearLeccion("Crear una piece decorativa", "Proyecto final: diseño de piece completo con quotes, flourishes y elementos decorativos.", "https://www.youtube.com/watch?v=ejemplo14", 22, true),
                     crearLeccion("Recursos y práctica continua", "Dónde encontrar más inspiración, libros y ejercicios para seguir mejorando.", null, 8, false)
                 )
@@ -94,7 +95,7 @@ public class CourseDataLoader implements CommandLineRunner {
             crearCurso(
                 "diseno-grafico-para-no-disenhadores",
                 "Diseño Gráfico para No Diseñadores",
-                "Creá gráficos profesionales para redes sociales, packaging ycartelería sin ser diseñador. Aprendé a usar Canva y principios de diseño.",
+                "Creá gráficos profesionales para redes sociales, packaging y cartelería sin ser diseñador. Aprendé a usar Canva y principios de diseño.",
                 6000.0,
                 Nivel.principiante,
                 Modalidad.video,
@@ -103,7 +104,7 @@ public class CourseDataLoader implements CommandLineRunner {
                 List.of("diseño", "canva", "gráfico", "redes sociales", "packaging", "carteleria"),
                 List.of(
                     crearLeccion("Principios de diseño visual", "Contraste, jerarquía, alineación, repetición y proximidad. Cómo aplicarlos en cualquier pieza.", "https://www.youtube.com/watch?v=ejemplo20", 12, true),
-                    crearLeccion("Canva profesional: tips avanzados", "Funciones menos conocidas de Canva:，品牌 colours, templates personalizados y elementos vectoriales.", "https://www.youtube.com/watch?v=ejemplo21", 18, false),
+                    crearLeccion("Canva profesional: tips avanzados", "Funciones menos conocidas de Canva: colores de marca, templates personalizados y elementos vectoriales.", "https://www.youtube.com/watch?v=ejemplo21", 18, false),
                     crearLeccion("Palette de colores", "Cómo crear paletas de colores armónicas. Teoría del color y herramientas útiles.", null, 10, false),
                     crearLeccion("Tipografía para no diseñadores", "Combinar fuentes sin romper el diseño. Google Fonts, pairing y tamaño correcto.", "https://www.youtube.com/watch?v=ejemplo22", 14, false),
                     crearLeccion("Stories de Instagram", "Plantillas para stories: portadas, countdowns, carruseles educativos y promos.", "https://www.youtube.com/watch?v=ejemplo23", 15, false),
@@ -114,13 +115,20 @@ public class CourseDataLoader implements CommandLineRunner {
             )
         );
 
-        for (Curso curso : cursos) {
-            for (Leccion leccion : curso.getLecciones()) {
-                leccion.setCurso(curso);
+        // Only save courses that don't already exist (by slug)
+        List<Curso> nuevosCursos = allCursos.stream()
+                .filter(c -> !existingSlugs.contains(c.getSlug()))
+                .toList();
+
+        if (!nuevosCursos.isEmpty()) {
+            for (Curso curso : nuevosCursos) {
+                for (Leccion leccion : curso.getLecciones()) {
+                    leccion.setCurso(curso);
+                }
             }
+            cursoRepository.saveAll(nuevosCursos);
+            System.out.println("=== " + nuevosCursos.size() + " cursos nuevos cargados con " + nuevosCursos.stream().mapToInt(c -> c.getLecciones().size()).sum() + " lecciones ===");
         }
-        cursoRepository.saveAll(cursos);
-        System.out.println("=== " + cursos.size() + " cursos cargados con " + cursos.stream().mapToInt(c -> c.getLecciones().size()).sum() + " lecciones ===");
     }
 
     private Curso crearCurso(String slug, String titulo, String descripcion, Double precio, Nivel nivel, Modalidad modalidad, String instructor, Integer duracionHoras, List<String> tags, List<Leccion> lecciones) {
