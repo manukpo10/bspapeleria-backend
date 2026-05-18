@@ -19,11 +19,30 @@ public class CourseDataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (cursoRepository.count() > 0) {
-            return;
-        }
+        // NOTE: allowing re-run to support adding new courses — slug UNIQUE constraint prevents duplicates
+        // if (cursoRepository.count() > 0) {
+        //     return;
+        // }
 
         List<Curso> cursos = List.of(
+            crearCurso(
+                "candy-bar-powerpoint",
+                "Candy Bar en PowerPoint",
+                "Aprendé a decorar eventos desde cero usando PowerPoint. Vamos a diseñar banderines, carteles, stickers, chipbags, milkbox, bolsitas y pochocleras.",
+                25000.0,
+                Nivel.principiante,
+                Modalidad.video,
+                "BS Papeleria",
+                6,
+                List.of("candybar", "powerpoint", "decoracion", "eventos", "diseño"),
+                List.of(
+                    crearLeccion("Presentación del curso", "Presentación general del curso Candy Bar en PowerPoint.", "https://drive.google.com/file/d/1-0_qd-BwAorNOIG29odQa7Q1dzJenFmw/preview", 5, true),
+                    crearLeccion("Presentación de mesa de trabajo", "Conocé el entorno de PowerPoint y la mesa de trabajo.", "https://drive.google.com/file/d/1SczFViXWXkJXl26M0iv_aMudq7W4VNZH/preview", 8, false),
+                    crearLeccion("Formas y Líneas", "Cómo usar formas y líneas en PowerPoint para crear piezas decorativas.", "https://drive.google.com/file/d/1TVDa_dE2QDe2JMd3k-B8GiAGTWcZHv9h/preview", 12, false),
+                    crearLeccion("Máscara de Recorte y Relleno de Forma", "Técnicas de máscara de recorte y relleno de forma.", "https://drive.google.com/file/d/1cpLr3o6HmpYElxb5ZujqUCgSWcY6g-d7/preview", 15, false),
+                    crearLeccion("Video Bonus - Descarga e Instalación de Fuentes", "Cómo descargar e instalar fuentes personalizadas en tu computadora.", "https://drive.google.com/file/d/1JGWd33kskT2wVvNrXeB8idgk6KdkeUQX/preview", 10, false)
+                )
+            ),
             crearCurso(
                 "sublimacion-desde-cero",
                 "Sublimación desde Cero",
