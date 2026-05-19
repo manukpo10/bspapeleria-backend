@@ -24,6 +24,7 @@ public class CursoResponse {
     private Integer estudiantesCount;
     private Double rating;
     private List<String> tags;
+    private List<String> materialUrls;
     private List<LeccionResponse> lecciones;
     private LocalDateTime createdAt;
 }

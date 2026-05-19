@@ -91,6 +91,7 @@ public class CursoService {
                 .duracionHoras(request.getDuracionHoras())
                 .urlVideoIntro(request.getUrlVideoIntro())
                 .tags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null)
+                .materialUrls(request.getMaterialUrls() != null ? new ArrayList<>(request.getMaterialUrls()) : new ArrayList<>())
                 .build();
 
         if (request.getLecciones() != null && !request.getLecciones().isEmpty()) {
@@ -129,6 +130,7 @@ public class CursoService {
         curso.setDuracionHoras(request.getDuracionHoras());
         curso.setUrlVideoIntro(request.getUrlVideoIntro());
         curso.setTags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null);
+        curso.setMaterialUrls(request.getMaterialUrls() != null ? new ArrayList<>(request.getMaterialUrls()) : new ArrayList<>());
 
         if (request.getLecciones() != null) {
             curso.getLecciones().clear();
@@ -211,6 +213,7 @@ public class CursoService {
                 .estudiantesCount(curso.getEstudiantesCount())
                 .rating(curso.getRating())
                 .tags(curso.getTags() != null ? new java.util.ArrayList<>(curso.getTags()) : null)
+                .materialUrls(curso.getMaterialUrls() != null ? new java.util.ArrayList<>(curso.getMaterialUrls()) : null)
                 .lecciones(lecciones)
                 .createdAt(curso.getFechaCreacion())
                 .build();

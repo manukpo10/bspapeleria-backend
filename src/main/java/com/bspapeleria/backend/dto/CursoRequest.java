@@ -35,5 +35,7 @@ public class CursoRequest {
 
     private List<String> tags;
 
+    private List<String> materialUrls;
+
     private List<LeccionRequest> lecciones;
 }

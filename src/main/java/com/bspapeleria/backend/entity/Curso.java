@@ -73,6 +73,12 @@ public class Curso {
     @Builder.Default
     private Set<String> tags = new HashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name = "curso_materiales", joinColumns = @JoinColumn(name = "curso_id"))
+    @Column(name = "url_material")
+    @Builder.Default
+    private List<String> materialUrls = new ArrayList<>();
+
     @Column(nullable = false)
     private LocalDateTime fechaCreacion;
 
@@ -87,6 +93,7 @@ public class Curso {
         if (activo == null) activo = true;
         if (estudiantesCount == null) estudiantesCount = 0;
         if (rating == null) rating = 0.0;
+        if (materialUrls == null) materialUrls = new ArrayList<>();
     }
 
     @PreUpdate
