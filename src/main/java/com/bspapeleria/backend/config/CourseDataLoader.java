@@ -42,6 +42,14 @@ public class CourseDataLoader implements CommandLineRunner {
                     crearLeccion("Formas y Líneas", "Cómo usar formas y líneas en PowerPoint para crear piezas decorativas.", "https://drive.google.com/file/d/1TVDa_dE2QDe2JMd3k-B8GiAGTWcZHv9h/preview", 12, false),
                     crearLeccion("Máscara de Recorte y Relleno de Forma", "Técnicas de máscara de recorte y relleno de forma.", "https://drive.google.com/file/d/1cpLr3o6HmpYElxb5ZujqUCgSWcY6g-d7/preview", 15, false),
                     crearLeccion("Video Bonus - Descarga e Instalación de Fuentes", "Cómo descargar e instalar fuentes personalizadas en tu computadora.", "https://drive.google.com/file/d/1JGWd33kskT2wVvNrXeB8idgk6KdkeUQX/preview", 10, false)
+                ),
+                List.of(
+                    "https://kpnukedjelyfoewpqwpr.supabase.co/storage/v1/object/public/course-materials/candy-bar-powerpoint/MEDIDAS%20PARA%20STICKERS%20(GOLOSINAS%20ENVUELTAS).pptx",
+                    "https://kpnukedjelyfoewpqwpr.supabase.co/storage/v1/object/public/course-materials/candy-bar-powerpoint/MEDIDAS%20STICKERS%20PARA%20GOLOSINAS%20(SIMPLES).pptx",
+                    "https://kpnukedjelyfoewpqwpr.supabase.co/storage/v1/object/public/course-materials/candy-bar-powerpoint/MOLDE%20BOLSITA.pptx",
+                    "https://kpnukedjelyfoewpqwpr.supabase.co/storage/v1/object/public/course-materials/candy-bar-powerpoint/MOLDE%20CHIP%20BAG.pptx",
+                    "https://kpnukedjelyfoewpqwpr.supabase.co/storage/v1/object/public/course-materials/candy-bar-powerpoint/MOLDE%20MILK%20BOX.pptx",
+                    "https://kpnukedjelyfoewpqwpr.supabase.co/storage/v1/object/public/course-materials/candy-bar-powerpoint/MOLDE%20POCHOCLERA.pptx"
                 )
             ),
             crearCurso(
@@ -68,6 +76,7 @@ public class CourseDataLoader implements CommandLineRunner {
                     crearLeccion("Marketing en redes", "Instagram, TikTok y WhatsApp para vender sublimación. Posts, reels y atención al cliente.", "https://www.youtube.com/watch?v=ejemplo5", 16, false),
                     crearLeccion("Proyecto final: kit completo", "Armamos un kit de regalo desde cero: remera + taza + placa + packaging.", "https://www.youtube.com/watch?v=ejemplo6", 25, true)
                 )
+                , null
             ),
             crearCurso(
                 "lettering-basico",
@@ -91,6 +100,7 @@ public class CourseDataLoader implements CommandLineRunner {
                     crearLeccion("Crear una piece decorativa", "Proyecto final: diseño de piece completo con quotes, flourishes y elementos decorativos.", "https://www.youtube.com/watch?v=ejemplo14", 22, true),
                     crearLeccion("Recursos y práctica continua", "Dónde encontrar más inspiración, libros y ejercicios para seguir mejorando.", null, 8, false)
                 )
+                , null
             ),
             crearCurso(
                 "diseno-grafico-para-no-disenhadores",
@@ -112,6 +122,7 @@ public class CourseDataLoader implements CommandLineRunner {
                     crearLeccion("Cartelería para eventos", "Diseñar entradas, números de mesa y banners para bodas y cumpleaños.", "https://www.youtube.com/watch?v=ejemplo24", 16, false),
                     crearLeccion("Portfolio visual", "Cómo armar un portfolio digital atractivo para mostrar tu trabajo. Proyecto final.", "https://www.youtube.com/watch?v=ejemplo25", 20, true)
                 )
+                , null
             )
         );
 
@@ -131,7 +142,7 @@ public class CourseDataLoader implements CommandLineRunner {
         }
     }
 
-    private Curso crearCurso(String slug, String titulo, String descripcion, Double precio, Nivel nivel, Modalidad modalidad, String instructor, Integer duracionHoras, List<String> tags, List<Leccion> lecciones) {
+    private Curso crearCurso(String slug, String titulo, String descripcion, Double precio, Nivel nivel, Modalidad modalidad, String instructor, Integer duracionHoras, List<String> tags, List<Leccion> lecciones, List<String> materialUrls) {
         return Curso.builder()
                 .slug(slug)
                 .titulo(titulo)
@@ -145,6 +156,7 @@ public class CourseDataLoader implements CommandLineRunner {
                 .duracionHoras(duracionHoras)
                 .tags(tags != null ? new java.util.HashSet<>(tags) : null)
                 .lecciones(lecciones != null ? new java.util.HashSet<>(lecciones) : null)
+                .materialUrls(materialUrls != null ? new java.util.ArrayList<>(materialUrls) : new java.util.ArrayList<>())
                 .estudiantesCount((int) (Math.random() * 100))
                 .rating(3.5 + Math.round(Math.random() * 15) / 10.0)
                 .build();
