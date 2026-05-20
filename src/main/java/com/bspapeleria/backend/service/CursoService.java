@@ -94,11 +94,11 @@ public class CursoService {
                 .urlVideoIntro(request.getUrlVideoIntro())
                 .tags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : new java.util.HashSet<>())
                 .materialUrls(request.getMaterialUrls() != null ? new ArrayList<>(request.getMaterialUrls()) : new ArrayList<>())
-                .modulos(new ArrayList<>())
+                .modulos(new HashSet<>())
                 .build();
 
         if (request.getModulos() != null && !request.getModulos().isEmpty()) {
-            List<Modulo> modulos = buildModulos(request.getModulos(), curso);
+            Set<Modulo> modulos = buildModulos(request.getModulos(), curso);
             curso.setModulos(modulos);
         }
 
@@ -144,7 +144,7 @@ public class CursoService {
 
     // ── helpers ────────────────────────────────────────────────────────────
 
-    private List<Modulo> buildModulos(List<ModuloRequest> moduloRequests, Curso curso) {
+    private Set<Modulo> buildModulos(List<ModuloRequest> moduloRequests, Curso curso) {
         return moduloRequests.stream()
                 .map(mr -> {
                     Modulo modulo = Modulo.builder()
