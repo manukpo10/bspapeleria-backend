@@ -8,7 +8,7 @@ import java.util.List;
 @Repository
 public interface LeccionRepository extends JpaRepository<Leccion, Long> {
 
-    List<Leccion> findByCursoIdOrderByOrdenAsc(Long cursoId);
+    List<Leccion> findByModuloIdOrderByOrdenAsc(Long moduloId);
 
-    int countByCursoId(Long cursoId);
+    int countByModuloId(Long moduloId);
 }
