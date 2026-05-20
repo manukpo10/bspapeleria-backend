@@ -19,7 +19,7 @@ public class Leccion {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modulo_id", nullable = false)
+    @JoinColumn(name = "modulo_id", nullable = true)
     private Modulo modulo;
 
     @Column(nullable = false)

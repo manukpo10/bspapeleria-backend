@@ -3,8 +3,10 @@ package com.bspapeleria.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "modulos")
@@ -35,7 +37,7 @@ public class Modulo {
     @OneToMany(mappedBy = "modulo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("orden ASC")
     @Builder.Default
-    private List<Leccion> lecciones = new ArrayList<>();
+    private Set<Leccion> lecciones = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

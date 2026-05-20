@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -150,11 +152,11 @@ public class CursoService {
                             .titulo(mr.getTitulo())
                             .descripcion(mr.getDescripcion())
                             .orden(mr.getOrden() != null ? mr.getOrden() : 0)
-                            .lecciones(new ArrayList<>())
+                            .lecciones(new HashSet<>())
                             .build();
 
                     if (mr.getLecciones() != null && !mr.getLecciones().isEmpty()) {
-                        List<Leccion> lecciones = mr.getLecciones().stream()
+                        Set<Leccion> lecciones = mr.getLecciones().stream()
                                 .map(lr -> Leccion.builder()
                                         .modulo(modulo)
                                         .titulo(lr.getTitulo())
@@ -165,7 +167,7 @@ public class CursoService {
                                         .duracionMinutos(lr.getDuracionMinutos() != null ? lr.getDuracionMinutos() : 0)
                                         .esPreview(lr.getEsPreview() != null ? lr.getEsPreview() : false)
                                         .build())
-                                .collect(Collectors.toList());
+                                .collect(Collectors.toCollection(HashSet::new));
                         modulo.setLecciones(lecciones);
                     }
 

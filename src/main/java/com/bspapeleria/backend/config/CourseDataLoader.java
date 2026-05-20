@@ -147,7 +147,7 @@ public class CourseDataLoader implements CommandLineRunner {
                 .titulo(titulo)
                 .descripcion(descripcion)
                 .orden(orden)
-                .lecciones(new ArrayList<>(lecciones))
+                .lecciones(new HashSet<>(lecciones))
                 .build();
     }
 

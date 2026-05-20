@@ -66,7 +66,7 @@ public class Curso {
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("orden ASC")
     @Builder.Default
-    private List<Modulo> modulos = new ArrayList<>();
+    private Set<Modulo> modulos = new LinkedHashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "curso_tags", joinColumns = @JoinColumn(name = "curso_id"))
