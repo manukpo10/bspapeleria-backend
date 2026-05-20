@@ -78,7 +78,7 @@ public class ProgresoService {
         }
 
         int totalLecciones = cursoRepository.findById(cursoId)
-                .map(c -> c.getLecciones().size())
+                .map(c -> c.getModulos().stream().mapToInt(m -> m.getLecciones().size()).sum())
                 .orElse(0);
 
         if (totalLecciones > 0) {
@@ -110,7 +110,7 @@ public class ProgresoService {
         }
 
         int totalLecciones = cursoRepository.findById(cursoId)
-                .map(c -> c.getLecciones().size())
+                .map(c -> c.getModulos().stream().mapToInt(m -> m.getLecciones().size()).sum())
                 .orElse(0);
 
         if (totalLecciones > 0) {

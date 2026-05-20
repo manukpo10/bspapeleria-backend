@@ -3,6 +3,7 @@ package com.bspapeleria.backend.service;
 import com.bspapeleria.backend.dto.*;
 import com.bspapeleria.backend.entity.Curso;
 import com.bspapeleria.backend.entity.Leccion;
+import com.bspapeleria.backend.entity.Modulo;
 import com.bspapeleria.backend.exception.BadRequestException;
 import com.bspapeleria.backend.exception.ResourceNotFoundException;
 import com.bspapeleria.backend.repository.CursoRepository;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,24 +90,14 @@ public class CursoService {
                 .instructor(request.getInstructor())
                 .duracionHoras(request.getDuracionHoras())
                 .urlVideoIntro(request.getUrlVideoIntro())
-                .tags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null)
+                .tags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : new java.util.HashSet<>())
                 .materialUrls(request.getMaterialUrls() != null ? new ArrayList<>(request.getMaterialUrls()) : new ArrayList<>())
+                .modulos(new ArrayList<>())
                 .build();
 
-        if (request.getLecciones() != null && !request.getLecciones().isEmpty()) {
-            Set<Leccion> lecciones = request.getLecciones().stream()
-                    .map(lr -> Leccion.builder()
-                            .curso(curso)
-                            .titulo(lr.getTitulo())
-                            .contenido(lr.getContenido())
-                            .urlVideo(lr.getUrlVideo())
-                            .urlMaterial(lr.getUrlMaterial())
-                            .orden(lr.getOrden())
-                            .duracionMinutos(lr.getDuracionMinutos() != null ? lr.getDuracionMinutos() : 0)
-                            .esPreview(lr.getEsPreview() != null ? lr.getEsPreview() : false)
-                            .build())
-                    .collect(Collectors.toSet());
-            curso.setLecciones(lecciones);
+        if (request.getModulos() != null && !request.getModulos().isEmpty()) {
+            List<Modulo> modulos = buildModulos(request.getModulos(), curso);
+            curso.setModulos(modulos);
         }
 
         cursoRepository.save(curso);
@@ -129,24 +119,13 @@ public class CursoService {
         curso.setInstructor(request.getInstructor());
         curso.setDuracionHoras(request.getDuracionHoras());
         curso.setUrlVideoIntro(request.getUrlVideoIntro());
-        curso.setTags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : null);
+        curso.setTags(request.getTags() != null ? new java.util.HashSet<>(request.getTags()) : new java.util.HashSet<>());
         curso.setMaterialUrls(request.getMaterialUrls() != null ? new ArrayList<>(request.getMaterialUrls()) : new ArrayList<>());
 
-        if (request.getLecciones() != null) {
-            curso.getLecciones().clear();
-            Set<Leccion> lecciones = request.getLecciones().stream()
-                    .map(lr -> Leccion.builder()
-                            .curso(curso)
-                            .titulo(lr.getTitulo())
-                            .contenido(lr.getContenido())
-                            .urlVideo(lr.getUrlVideo())
-                            .urlMaterial(lr.getUrlMaterial())
-                            .orden(lr.getOrden())
-                            .duracionMinutos(lr.getDuracionMinutos() != null ? lr.getDuracionMinutos() : 0)
-                            .esPreview(lr.getEsPreview() != null ? lr.getEsPreview() : false)
-                            .build())
-                    .collect(Collectors.toSet());
-            curso.getLecciones().addAll(lecciones);
+        if (request.getModulos() != null) {
+            curso.getModulos().clear();
+            List<Modulo> modulos = buildModulos(request.getModulos(), curso);
+            curso.getModulos().addAll(modulos);
         }
 
         cursoRepository.save(curso);
@@ -159,6 +138,40 @@ public class CursoService {
             throw new ResourceNotFoundException("Curso no encontrado: " + id);
         }
         cursoRepository.deleteById(id);
+    }
+
+    // ── helpers ────────────────────────────────────────────────────────────
+
+    private List<Modulo> buildModulos(List<ModuloRequest> moduloRequests, Curso curso) {
+        return moduloRequests.stream()
+                .map(mr -> {
+                    Modulo modulo = Modulo.builder()
+                            .curso(curso)
+                            .titulo(mr.getTitulo())
+                            .descripcion(mr.getDescripcion())
+                            .orden(mr.getOrden() != null ? mr.getOrden() : 0)
+                            .lecciones(new ArrayList<>())
+                            .build();
+
+                    if (mr.getLecciones() != null && !mr.getLecciones().isEmpty()) {
+                        List<Leccion> lecciones = mr.getLecciones().stream()
+                                .map(lr -> Leccion.builder()
+                                        .modulo(modulo)
+                                        .titulo(lr.getTitulo())
+                                        .contenido(lr.getContenido())
+                                        .urlVideo(lr.getUrlVideo())
+                                        .urlMaterial(lr.getUrlMaterial())
+                                        .orden(lr.getOrden() != null ? lr.getOrden() : 0)
+                                        .duracionMinutos(lr.getDuracionMinutos() != null ? lr.getDuracionMinutos() : 0)
+                                        .esPreview(lr.getEsPreview() != null ? lr.getEsPreview() : false)
+                                        .build())
+                                .collect(Collectors.toList());
+                        modulo.setLecciones(lecciones);
+                    }
+
+                    return modulo;
+                })
+                .collect(Collectors.toList());
     }
 
     private Curso.Nivel parseNivel(String nivel) {
@@ -180,19 +193,32 @@ public class CursoService {
     }
 
     private CursoResponse toResponse(Curso curso) {
-        List<LeccionResponse> lecciones = null;
-        if (curso.getLecciones() != null && !curso.getLecciones().isEmpty()) {
-            lecciones = curso.getLecciones().stream()
-                    .map(l -> LeccionResponse.builder()
-                            .id(l.getId())
-                            .titulo(l.getTitulo())
-                            .contenido(l.getContenido())
-                            .urlVideo(l.getUrlVideo())
-                            .urlMaterial(l.getUrlMaterial())
-                            .orden(l.getOrden())
-                            .duracionMinutos(l.getDuracionMinutos())
-                            .esPreview(l.getEsPreview())
-                            .build())
+        List<ModuloResponse> modulos = null;
+        if (curso.getModulos() != null && !curso.getModulos().isEmpty()) {
+            modulos = curso.getModulos().stream()
+                    .map(m -> {
+                        List<LeccionResponse> lecciones = m.getLecciones() == null ? new ArrayList<>() :
+                                m.getLecciones().stream()
+                                        .map(l -> LeccionResponse.builder()
+                                                .id(l.getId())
+                                                .titulo(l.getTitulo())
+                                                .contenido(l.getContenido())
+                                                .urlVideo(l.getUrlVideo())
+                                                .urlMaterial(l.getUrlMaterial())
+                                                .orden(l.getOrden())
+                                                .duracionMinutos(l.getDuracionMinutos())
+                                                .esPreview(l.getEsPreview())
+                                                .build())
+                                        .collect(Collectors.toList());
+
+                        return ModuloResponse.builder()
+                                .id(m.getId())
+                                .titulo(m.getTitulo())
+                                .descripcion(m.getDescripcion())
+                                .orden(m.getOrden())
+                                .lecciones(lecciones)
+                                .build();
+                    })
                     .collect(Collectors.toList());
         }
 
@@ -212,9 +238,9 @@ public class CursoService {
                 .activo(curso.getActivo())
                 .estudiantesCount(curso.getEstudiantesCount())
                 .rating(curso.getRating())
-                .tags(curso.getTags() != null ? new java.util.ArrayList<>(curso.getTags()) : null)
-                .materialUrls(curso.getMaterialUrls() != null ? new java.util.ArrayList<>(curso.getMaterialUrls()) : null)
-                .lecciones(lecciones)
+                .tags(curso.getTags() != null ? new ArrayList<>(curso.getTags()) : new ArrayList<>())
+                .materialUrls(curso.getMaterialUrls() != null ? new ArrayList<>(curso.getMaterialUrls()) : new ArrayList<>())
+                .modulos(modulos)
                 .createdAt(curso.getFechaCreacion())
                 .build();
     }

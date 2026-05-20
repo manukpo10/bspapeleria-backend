@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.LinkedHashSet;
 
 @Entity
 @Table(name = "cursos")
@@ -65,7 +66,7 @@ public class Curso {
     @OneToMany(mappedBy = "curso", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("orden ASC")
     @Builder.Default
-    private Set<Leccion> lecciones = new HashSet<>();
+    private List<Modulo> modulos = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "curso_tags", joinColumns = @JoinColumn(name = "curso_id"))
@@ -94,6 +95,7 @@ public class Curso {
         if (estudiantesCount == null) estudiantesCount = 0;
         if (rating == null) rating = 0.0;
         if (materialUrls == null) materialUrls = new ArrayList<>();
+        if (modulos == null) modulos = new ArrayList<>();
     }
 
     @PreUpdate

@@ -25,6 +25,6 @@ public class CursoResponse {
     private Double rating;
     private List<String> tags;
     private List<String> materialUrls;
-    private List<LeccionResponse> lecciones;
+    private List<ModuloResponse> modulos;
     private LocalDateTime createdAt;
 }
