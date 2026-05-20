@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface CursoRepository extends JpaRepository<Curso, Long> {
 
-    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags LEFT JOIN FETCH c.lecciones WHERE c.slug = :slug AND c.activo = true")
+    @Query("SELECT DISTINCT c FROM Curso c LEFT JOIN FETCH c.tags LEFT JOIN FETCH c.modulos m LEFT JOIN FETCH m.lecciones WHERE c.slug = :slug AND c.activo = true")
     Optional<Curso> findBySlug(@Param("slug") String slug);
 
 Page<Curso> findByActivoTrue(Pageable pageable);
