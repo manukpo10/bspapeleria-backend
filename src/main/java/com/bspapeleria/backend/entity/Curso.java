@@ -95,7 +95,7 @@ public class Curso {
         if (estudiantesCount == null) estudiantesCount = 0;
         if (rating == null) rating = 0.0;
         if (materialUrls == null) materialUrls = new ArrayList<>();
-        if (modulos == null) modulos = new ArrayList<>();
+        if (modulos == null) modulos = new HashSet<>();
     }
 
     @PreUpdate

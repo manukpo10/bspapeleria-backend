@@ -42,7 +42,7 @@ public class Modulo {
     @PrePersist
     protected void onCreate() {
         if (orden == null) orden = 0;
-        if (lecciones == null) lecciones = new ArrayList<>();
+        if (lecciones == null) lecciones = new HashSet<>();
     }
 
     @Override
