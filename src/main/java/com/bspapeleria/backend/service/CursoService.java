@@ -39,7 +39,7 @@ public class CursoService {
 
     @Transactional(readOnly = true)
     public CursoResponse getCursoById(Long id) {
-        Curso curso = cursoRepository.findById(id)
+        Curso curso = cursoRepository.findByIdWithModulos(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Curso no encontrado: " + id));
         return toResponse(curso);
     }
@@ -109,7 +109,7 @@ public class CursoService {
 
     @Transactional
     public CursoResponse updateCurso(Long id, CursoRequest request) {
-        Curso curso = cursoRepository.findById(id)
+        Curso curso = cursoRepository.findByIdWithModulos(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Curso no encontrado: " + id));
 
         curso.setTitulo(request.getTitulo());
