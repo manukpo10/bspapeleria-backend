@@ -126,7 +126,7 @@ public class CursoService {
 
         if (request.getModulos() != null) {
             curso.getModulos().clear();
-            List<Modulo> modulos = buildModulos(request.getModulos(), curso);
+            Set<Modulo> modulos = buildModulos(request.getModulos(), curso);
             curso.getModulos().addAll(modulos);
         }
 
@@ -173,7 +173,7 @@ public class CursoService {
 
                     return modulo;
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     private Curso.Nivel parseNivel(String nivel) {

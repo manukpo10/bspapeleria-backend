@@ -123,7 +123,7 @@ public class CourseDataLoader implements CommandLineRunner {
                 .instructor(instructor)
                 .duracionHoras(duracionHoras)
                 .tags(tags != null ? new java.util.HashSet<>(tags) : new java.util.HashSet<>())
-                .modulos(modulos != null ? new ArrayList<>(modulos) : new ArrayList<>())
+                .modulos(modulos != null ? new HashSet<>(modulos) : new HashSet<>())
                 .materialUrls(materialUrls != null ? new ArrayList<>(materialUrls) : new ArrayList<>())
                 .estudiantesCount(0)
                 .rating(0.0)
