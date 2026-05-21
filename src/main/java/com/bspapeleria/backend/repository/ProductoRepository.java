@@ -20,6 +20,9 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     Page<Producto> findByActivoTrue(Pageable pageable);
 
+    @Query("SELECT DISTINCT p FROM Producto p LEFT JOIN FETCH p.imagenes LEFT JOIN FETCH p.tags WHERE p.activo = true")
+    List<Producto> findAllActivosWithCollections();
+
     Page<Producto> findByCategoriaAndActivoTrue(Categoria categoria, Pageable pageable);
 
     Page<Producto> findByDestacadoTrueAndActivoTrue(Pageable pageable);

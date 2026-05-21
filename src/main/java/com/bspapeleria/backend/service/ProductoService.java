@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.PageImpl;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,12 @@ public class ProductoService {
 
     @Transactional(readOnly = true)
     public Page<ProductoResponse> getAllProductos(Pageable pageable) {
-        return productoRepository.findByActivoTrue(pageable).map(this::toResponse);
+        List<Producto> all = productoRepository.findAllActivosWithCollections();
+        List<ProductoResponse> responses = all.stream().map(this::toResponse).collect(Collectors.toList());
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), responses.size());
+        List<ProductoResponse> page = start >= responses.size() ? List.of() : responses.subList(start, end);
+        return new PageImpl<>(page, pageable, responses.size());
     }
 
     @Transactional(readOnly = true)
