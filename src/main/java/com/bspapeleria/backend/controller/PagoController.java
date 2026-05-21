@@ -31,7 +31,12 @@ public class PagoController {
     @PostMapping("/mercado-pago/webhook")
     public ResponseEntity<Void> webhook(
             @RequestParam(required = false) String topic,
-            @RequestParam(required = false) String id) {
+            @RequestParam(required = false) String id,
+            @RequestHeader(value = "x-signature", required = false) String signature,
+            @RequestHeader(value = "x-request-id", required = false) String requestId) {
+        if (!pagoService.validarFirmaWebhook(signature, requestId, id)) {
+            return ResponseEntity.status(401).build();
+        }
         pagoService.procesarWebhook(topic, id);
         return ResponseEntity.ok().build();
     }

@@ -4,10 +4,12 @@ import com.bspapeleria.backend.entity.Usuario;
 import com.bspapeleria.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Profile("dev")
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
 
@@ -52,9 +54,6 @@ public class DataLoader implements CommandLineRunner {
                     .build());
         }
 
-        System.out.println("=== Seed Data Loaded ===");
-        System.out.println("Admin:     admin@bspapeleria.com / admin123");
-        System.out.println("Profesor:  profesor@bspapeleria.com / profesor123");
-        System.out.println("Alumno:    alumno@bspapeleria.com / alumno123");
+        System.out.println("=== Dev seed data loaded ===");
     }
 }

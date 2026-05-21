@@ -28,6 +28,9 @@ public class PagoService {
     @Value("${mercadopago.sandbox:true}")
     private boolean sandbox;
 
+    @Value("${app.backend-url:http://localhost:8080}")
+    private String backendUrl;
+
     private final OrdenRepository ordenRepository;
     private final OrdenService ordenService;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -132,7 +135,39 @@ public class PagoService {
         }
     }
 
+    public boolean validarFirmaWebhook(String signature, String requestId, String dataId) {
+        // Si MP_WEBHOOK_SECRET no está configurado, aceptamos en modo dev/sandbox
+        String webhookSecret = System.getenv("MP_WEBHOOK_SECRET");
+        if (webhookSecret == null || webhookSecret.isBlank()) {
+            log.warn("MP_WEBHOOK_SECRET no configurado — webhook no validado");
+            return true;
+        }
+        if (signature == null || requestId == null || dataId == null) {
+            log.warn("Webhook rechazado: firma o headers faltantes");
+            return false;
+        }
+        try {
+            // Formato de firma MP: ts=<timestamp>,v1=<hash>
+            String ts = null, v1 = null;
+            for (String part : signature.split(",")) {
+                if (part.startsWith("ts=")) ts = part.substring(3);
+                if (part.startsWith("v1=")) v1 = part.substring(3);
+            }
+            if (ts == null || v1 == null) return false;
+            String manifest = "id:" + dataId + ";request-id:" + requestId + ";ts:" + ts + ";";
+            javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
+            mac.init(new javax.crypto.spec.SecretKeySpec(webhookSecret.getBytes(), "HmacSHA256"));
+            byte[] hashBytes = mac.doFinal(manifest.getBytes());
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hashBytes) hex.append(String.format("%02x", b));
+            return hex.toString().equals(v1);
+        } catch (Exception e) {
+            log.error("Error validando firma webhook: {}", e.getMessage());
+            return false;
+        }
+    }
+
     private String getNotificationUrl() {
-        return "http://localhost:8080/api/pagos/webhook";
+        return backendUrl + "/api/pagos/webhook";
     }
 }

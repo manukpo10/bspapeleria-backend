@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
 
+    @Value("${cors.allowed-origins:http://localhost:5173,http://localhost:3000,https://bspapeleria-frontend.vercel.app}")
+    private String allowedOriginsStr;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -41,10 +45,13 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/**", "/api/health", "/h2-console/**", "/error", "/actuator/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/health", "/error").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/**").hasRole("ADMIN")
+                .requestMatchers("/h2-console/**").denyAll()
                 .requestMatchers(HttpMethod.GET, "/api/productos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/cursos/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/cupones/validar", "/api/cupones/{codigo}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/cupones/validar").authenticated()
                 .requestMatchers("/api/pagos/mercado-pago/webhook", "/api/pagos/mercado-pago/config").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/valoraciones").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -60,13 +67,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "http://localhost:5174",
-            "https://bspapeleria-frontend.vercel.app",
-            "https://bspapeleria-frontend-git-main-manukpo10-8843s-projects.vercel.app"
-        ));
+        List<String> origins = Arrays.asList(allowedOriginsStr.split(","));
+        configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

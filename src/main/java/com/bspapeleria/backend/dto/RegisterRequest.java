@@ -19,6 +19,4 @@ public class RegisterRequest {
     private String password;
 
     private String telefono;
-
-    private String rol = "ALUMNO";
 }

@@ -35,15 +35,6 @@ public class AuthService {
         }
 
         Usuario.Rol rol = Usuario.Rol.CLIENTE;
-        if (request.getRol() != null) {
-            try {
-                rol = Usuario.Rol.valueOf(request.getRol().toUpperCase());
-                if (rol != Usuario.Rol.ADMIN && rol != Usuario.Rol.CLIENTE) {
-                    rol = Usuario.Rol.CLIENTE;
-                }
-            } catch (IllegalArgumentException ignored) {}
-        }
-        if (rol == null) rol = Usuario.Rol.CLIENTE;
 
         Usuario usuario = Usuario.builder()
                 .email(request.getEmail())
