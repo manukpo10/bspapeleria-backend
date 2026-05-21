@@ -24,12 +24,7 @@ public class ProductoService {
 
     @Transactional(readOnly = true)
     public Page<ProductoResponse> getAllProductos(Pageable pageable) {
-        List<Producto> all = productoRepository.findAllActivosWithCollections();
-        List<ProductoResponse> responses = all.stream().map(this::toResponse).collect(Collectors.toList());
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), responses.size());
-        List<ProductoResponse> page = start >= responses.size() ? List.of() : responses.subList(start, end);
-        return new PageImpl<>(page, pageable, responses.size());
+        return productoRepository.findByActivoTrue(pageable).map(this::toResponse);
     }
 
     @Transactional(readOnly = true)

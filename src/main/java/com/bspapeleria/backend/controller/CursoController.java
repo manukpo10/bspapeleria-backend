@@ -8,10 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/cursos")
@@ -53,17 +55,23 @@ public class CursoController {
             cursos = cursoService.getAllCursos(pageable);
         }
 
-        return ResponseEntity.ok(cursos);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(2, TimeUnit.MINUTES).cachePublic())
+                .body(cursos);
     }
 
     @GetMapping("/{slug}")
     public ResponseEntity<CursoResponse> getCursoBySlug(@PathVariable String slug) {
-        return ResponseEntity.ok(cursoService.getCursoBySlug(slug));
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES).cachePublic())
+                .body(cursoService.getCursoBySlug(slug));
     }
 
     @GetMapping("/id/{id}")
     public ResponseEntity<CursoResponse> getCursoById(@PathVariable Long id) {
-        return ResponseEntity.ok(cursoService.getCursoById(id));
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(5, TimeUnit.MINUTES).cachePublic())
+                .body(cursoService.getCursoById(id));
     }
 
     @PostMapping

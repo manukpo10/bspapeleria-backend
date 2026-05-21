@@ -2,6 +2,7 @@ package com.bspapeleria.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -36,6 +37,7 @@ public class Producto {
     @ElementCollection
     @CollectionTable(name = "producto_imagenes", joinColumns = @JoinColumn(name = "producto_id"))
     @Column(name = "imagen")
+    @BatchSize(size = 50)
     private Set<String> imagenes;
 
     @Enumerated(EnumType.STRING)
@@ -45,6 +47,7 @@ public class Producto {
     @ElementCollection
     @CollectionTable(name = "producto_tags", joinColumns = @JoinColumn(name = "producto_id"))
     @Column(name = "tag")
+    @BatchSize(size = 50)
     private Set<String> tags;
 
     @Column(nullable = false)
