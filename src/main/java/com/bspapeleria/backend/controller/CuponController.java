@@ -35,6 +35,7 @@ public class CuponController {
     }
 
     @GetMapping("/{codigo}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CuponResponse> getCuponByCodigo(@PathVariable String codigo) {
         return ResponseEntity.ok(cuponService.getCuponByCodigo(codigo));
     }

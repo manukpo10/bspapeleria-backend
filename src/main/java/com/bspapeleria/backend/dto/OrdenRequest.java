@@ -1,14 +1,16 @@
 package com.bspapeleria.backend.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import java.util.List;
 
 @Data
 public class OrdenRequest {
 
-    @NotNull
+    @NotEmpty(message = "El pedido debe incluir al menos un ítem")
+    @Valid
     private List<OrdenItemRequest> items;
 
     private String codigoCupon;

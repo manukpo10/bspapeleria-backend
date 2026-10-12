@@ -18,4 +18,10 @@ public class CuponResponse {
     private Integer usosCount;
     private Double descuentoMinimo;
     private Double descuentoMaximo;
+
+    /**
+     * Discount this coupon gives for the amount sent to {@code GET /api/cupones/validar}.
+     * Null in list, create and update responses, where there is no amount to apply it to.
+     */
+    private Double descuentoAplicable;
 }

@@ -2,9 +2,11 @@ package com.bspapeleria.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDateTime;
 
 @Entity
+@DynamicUpdate
 @Table(name = "cupones")
 @Data
 @NoArgsConstructor

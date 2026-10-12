@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +30,8 @@ public class OrdenService {
     private final ApplicationEventPublisher eventPublisher;
     private final ProgresoService progresoService;
     private final CuponService cuponService;
+
+    private static final BigDecimal COSTO_ENVIO_PRODUCTOS_FISICOS = new BigDecimal("1500.00");
 
     @Transactional(readOnly = true)
     public Page<OrdenResponse> getOrdenesByUsuario(Long usuarioId, Pageable pageable) {
@@ -80,8 +84,13 @@ public class OrdenService {
                 .notas(request.getNotas())
                 .build();
 
-        double subtotal = 0.0;
+        // Money is added up in BigDecimal and rounded to cents at every step, so the stored amounts carry no
+        // binary floating point noise and the total can never come out as a tiny negative number.
+        BigDecimal subtotal = BigDecimal.ZERO;
         List<OrdenDetalle> detalles = new ArrayList<>();
+        // Shipping is charged only when some PRODUCTO line is a physical product. Digital products are downloads
+        // and courses are online. esDigital comes from the stored product, never from the request.
+        boolean hayProductoFisico = false;
 
         for (OrdenItemRequest item : request.getItems()) {
             String nombreItem;
@@ -95,6 +104,10 @@ public class OrdenService {
                 imagenUrl = producto.getImagenes() != null && !producto.getImagenes().isEmpty()
                         ? producto.getImagenes().iterator().next() : null;
                 precioUnitario = producto.getPrecio();
+                // A product with no digital flag (null) is treated as physical.
+                if (!Boolean.TRUE.equals(producto.getEsDigital())) {
+                    hayProductoFisico = true;
+                }
             } else {
                 Curso curso = cursoRepository.findById(Long.parseLong(item.getItemId()))
                         .orElseThrow(() -> new ResourceNotFoundException("Curso no encontrado: " + item.getItemId()));
@@ -103,8 +116,9 @@ public class OrdenService {
                 precioUnitario = curso.getPrecio();
             }
 
-            double itemSubtotal = precioUnitario * item.getCantidad();
-            subtotal += itemSubtotal;
+            BigDecimal itemSubtotal = redondear(
+                    BigDecimal.valueOf(precioUnitario).multiply(BigDecimal.valueOf(item.getCantidad())));
+            subtotal = subtotal.add(itemSubtotal);
 
             OrdenDetalle detalle = OrdenDetalle.builder()
                     .orden(orden)
@@ -114,27 +128,29 @@ public class OrdenService {
                     .imagenUrl(imagenUrl)
                     .cantidad(item.getCantidad())
                     .precioUnitario(precioUnitario)
-                    .subtotal(itemSubtotal)
+                    .subtotal(itemSubtotal.doubleValue())
                     .build();
 
             detalles.add(detalle);
         }
 
-        boolean tieneProductosFisicos = detalles.stream()
-                .anyMatch(d -> d.getTipoItem() == OrdenDetalle.TipoItem.PRODUCTO);
+        BigDecimal costoEnvio = hayProductoFisico ? COSTO_ENVIO_PRODUCTOS_FISICOS : redondear(BigDecimal.ZERO);
+        BigDecimal descuento = redondear(BigDecimal.ZERO);
 
-        double costoEnvio = tieneProductosFisicos ? 1500.0 : 0.0;
-        double descuento = 0.0;
-
-        if (request.getCodigoCupon() != null && !request.getCodigoCupon().isEmpty()) {
-            descuento = calcularDescuento(subtotal, request.getCodigoCupon());
+        // The coupon is checked against the items subtotal (database prices, shipping excluded). An invalid coupon
+        // throws, so the transaction rolls back and no order is created; a valid one has its use counted atomically.
+        if (request.getCodigoCupon() != null && !request.getCodigoCupon().isBlank()) {
+            descuento = redondear(BigDecimal.valueOf(
+                    cuponService.aplicarCupon(request.getCodigoCupon(), subtotal.doubleValue())));
         }
 
+        BigDecimal total = redondear(subtotal.add(costoEnvio).subtract(descuento).max(BigDecimal.ZERO));
+
         orden.setDetalles(detalles);
-        orden.setSubtotal(subtotal);
-        orden.setDescuento(descuento);
-        orden.setCostoEnvio(costoEnvio);
-        orden.setTotal(subtotal - descuento + costoEnvio);
+        orden.setSubtotal(subtotal.doubleValue());
+        orden.setDescuento(descuento.doubleValue());
+        orden.setCostoEnvio(costoEnvio.doubleValue());
+        orden.setTotal(total.doubleValue());
 
         if (request.getDireccionEnvio() != null) {
             DireccionEnvioRequest dirReq = request.getDireccionEnvio();
@@ -204,36 +220,8 @@ public class OrdenService {
         ordenRepository.save(orden);
     }
 
-    private double calcularDescuento(double subtotal, String codigoCupon) {
-        try {
-            Cupon cupon = cuponService.findCuponByCodigo(codigoCupon).orElse(null);
-            if (cupon == null) {
-                return 0.0;
-            }
-
-            if (!cupon.getActivo()) {
-                return 0.0;
-            }
-
-            if (cupon.getFechaVencimiento() != null &&
-                cupon.getFechaVencimiento().isBefore(java.time.LocalDateTime.now())) {
-                return 0.0;
-            }
-
-            if (cupon.getUsosCount() >= cupon.getMaxUsos()) {
-                return 0.0;
-            }
-
-            if (cupon.getTipoDescuento() == Cupon.TipoDescuento.PORCENTAJE) {
-                return subtotal * (cupon.getValorDescuento() / 100.0);
-            } else if (cupon.getTipoDescuento() == Cupon.TipoDescuento.MONTO_FIJO) {
-                return Math.min(cupon.getValorDescuento(), subtotal);
-            }
-
-            return 0.0;
-        } catch (Exception e) {
-            return 0.0;
-        }
+    private static BigDecimal redondear(BigDecimal monto) {
+        return monto.setScale(2, RoundingMode.HALF_UP);
     }
 
     private Orden.MetodoPago parseMetodoPago(String metodo) {
