@@ -144,16 +144,26 @@ class CursoServiceDescripcionCortaTest {
     }
 
     @ParameterizedTest
-    @NullSource
     @ValueSource(strings = {"", "   ", "\t\n"})
-    void update_clearsTheShortDescriptionWhenTheRequestIsMissingOrBlank(String blank) {
-        // Same overwrite semantics as `descripcion`: an update replaces the stored value with what the request carries.
+    void update_clearsTheShortDescriptionWhenTheRequestSendsItBlank(String blank) {
         Curso existing = cursoBase().descripcionCorta("Frase vieja.").build();
         givenExisting(existing);
 
         cursoService.updateCurso(CURSO_ID, request(blank));
 
         assertThat(existing.getDescripcionCorta()).isNull();
+    }
+
+    @Test
+    void update_keepsTheShortDescriptionWhenTheRequestOmitsIt() {
+        // An admin tab still running a bundle from before the field existed sends no descripcionCorta at all:
+        // saving there must not wipe it. The current admin always sends the field, '' to clear it
+        Curso existing = cursoBase().descripcionCorta("Frase vieja.").build();
+        givenExisting(existing);
+
+        cursoService.updateCurso(CURSO_ID, request(null));
+
+        assertThat(existing.getDescripcionCorta()).isEqualTo("Frase vieja.");
     }
 
     @Test

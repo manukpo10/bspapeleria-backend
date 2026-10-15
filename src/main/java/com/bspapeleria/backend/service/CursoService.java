@@ -115,7 +115,10 @@ public class CursoService {
 
         curso.setTitulo(request.getTitulo());
         curso.setDescripcion(request.getDescripcion());
-        curso.setDescripcionCorta(blankToNull(request.getDescripcionCorta()));
+        // Absent means "not sent" (an admin bundle older than the field), so it keeps the stored value; blank clears it
+        if (request.getDescripcionCorta() != null) {
+            curso.setDescripcionCorta(blankToNull(request.getDescripcionCorta()));
+        }
         curso.setImagenUrl(request.getImagenUrl());
         curso.setPrecio(request.getPrecio());
         curso.setPrecioComparacion(request.getPrecioComparacion());
