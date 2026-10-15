@@ -85,6 +85,7 @@ public class CursoService {
         Curso curso = Curso.builder()
                 .titulo(request.getTitulo())
                 .descripcion(request.getDescripcion())
+                .descripcionCorta(blankToNull(request.getDescripcionCorta()))
                 .imagenUrl(request.getImagenUrl())
                 .precio(request.getPrecio())
                 .precioComparacion(request.getPrecioComparacion())
@@ -114,6 +115,7 @@ public class CursoService {
 
         curso.setTitulo(request.getTitulo());
         curso.setDescripcion(request.getDescripcion());
+        curso.setDescripcionCorta(blankToNull(request.getDescripcionCorta()));
         curso.setImagenUrl(request.getImagenUrl());
         curso.setPrecio(request.getPrecio());
         curso.setPrecioComparacion(request.getPrecioComparacion());
@@ -177,6 +179,13 @@ public class CursoService {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
+    /** Trims the text; a missing or blank value becomes {@code null} so the column never holds an empty summary. */
+    private static String blankToNull(String texto) {
+        if (texto == null) return null;
+        String recortado = texto.trim();
+        return recortado.isEmpty() ? null : recortado;
+    }
+
     private Curso.Nivel parseNivel(String nivel) {
         if (nivel == null || nivel.isEmpty()) return Curso.Nivel.principiante;
         try {
@@ -230,6 +239,7 @@ public class CursoService {
                 .slug(curso.getSlug())
                 .titulo(curso.getTitulo())
                 .descripcion(curso.getDescripcion())
+                .descripcionCorta(curso.getDescripcionCorta())
                 .imagenUrl(curso.getImagenUrl())
                 .precio(curso.getPrecio())
                 .precioComparacion(curso.getPrecioComparacion())

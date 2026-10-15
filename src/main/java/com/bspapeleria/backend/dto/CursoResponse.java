@@ -12,6 +12,7 @@ public class CursoResponse {
     private String slug;
     private String titulo;
     private String descripcion;
+    private String descripcionCorta;
     private String imagenUrl;
     private Double precio;
     private Double precioComparacion;
