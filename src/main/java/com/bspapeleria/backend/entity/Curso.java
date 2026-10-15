@@ -35,6 +35,9 @@ public class Curso {
     @Column(length = 500)
     private String descripcionCorta;
 
+    @Column(length = 500)
+    private String introduccionTemario;
+
     @Column(columnDefinition = "TEXT")
     private String imagenUrl;
 

@@ -13,6 +13,7 @@ public class CursoResponse {
     private String titulo;
     private String descripcion;
     private String descripcionCorta;
+    private String introduccionTemario;
     private String imagenUrl;
     private Double precio;
     private Double precioComparacion;

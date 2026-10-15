@@ -18,6 +18,9 @@ public class CursoRequest {
     @Size(max = 500, message = "La descripción corta no puede superar los 500 caracteres")
     private String descripcionCorta;
 
+    @Size(max = 500, message = "La introducción del temario no puede superar los 500 caracteres")
+    private String introduccionTemario;
+
     private String imagenUrl;
 
     @NotNull @Positive

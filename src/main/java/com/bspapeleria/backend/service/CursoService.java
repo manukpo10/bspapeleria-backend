@@ -86,6 +86,7 @@ public class CursoService {
                 .titulo(request.getTitulo())
                 .descripcion(request.getDescripcion())
                 .descripcionCorta(blankToNull(request.getDescripcionCorta()))
+                .introduccionTemario(blankToNull(request.getIntroduccionTemario()))
                 .imagenUrl(request.getImagenUrl())
                 .precio(request.getPrecio())
                 .precioComparacion(request.getPrecioComparacion())
@@ -118,6 +119,9 @@ public class CursoService {
         // Absent means "not sent" (an admin bundle older than the field), so it keeps the stored value; blank clears it
         if (request.getDescripcionCorta() != null) {
             curso.setDescripcionCorta(blankToNull(request.getDescripcionCorta()));
+        }
+        if (request.getIntroduccionTemario() != null) {
+            curso.setIntroduccionTemario(blankToNull(request.getIntroduccionTemario()));
         }
         curso.setImagenUrl(request.getImagenUrl());
         curso.setPrecio(request.getPrecio());
@@ -243,6 +247,7 @@ public class CursoService {
                 .titulo(curso.getTitulo())
                 .descripcion(curso.getDescripcion())
                 .descripcionCorta(curso.getDescripcionCorta())
+                .introduccionTemario(curso.getIntroduccionTemario())
                 .imagenUrl(curso.getImagenUrl())
                 .precio(curso.getPrecio())
                 .precioComparacion(curso.getPrecioComparacion())

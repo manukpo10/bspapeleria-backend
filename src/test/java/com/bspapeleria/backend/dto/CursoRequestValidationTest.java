@@ -67,4 +67,28 @@ class CursoRequestValidationTest {
     void shortDescriptionIsOptional(String value) {
         assertThat(validator.validate(request(value))).isEmpty();
     }
+
+    // The syllabus intro lives in the same kind of varchar(500) column, so it gets the same limit.
+
+    private static CursoRequest requestWithSyllabusIntro(String introduccionTemario) {
+        CursoRequest request = request(null);
+        request.setIntroduccionTemario(introduccionTemario);
+        return request;
+    }
+
+    @Test
+    void syllabusIntroOfExactlyTheColumnLimit_isValid() {
+        assertThat(validator.validate(requestWithSyllabusIntro("a".repeat(500)))).isEmpty();
+    }
+
+    @Test
+    void syllabusIntroOneCharacterOverTheColumnLimit_isRejectedWithASpanishMessage() {
+        Set<ConstraintViolation<CursoRequest>> violations =
+                validator.validate(requestWithSyllabusIntro("a".repeat(501)));
+
+        assertThat(violations).hasSize(1);
+        ConstraintViolation<CursoRequest> violation = violations.iterator().next();
+        assertThat(violation.getPropertyPath()).hasToString("introduccionTemario");
+        assertThat(violation.getMessage()).isEqualTo("La introducción del temario no puede superar los 500 caracteres");
+    }
 }
