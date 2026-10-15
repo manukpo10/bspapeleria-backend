@@ -1,7 +1,9 @@
 package com.bspapeleria.backend.entity;
 
+import com.bspapeleria.backend.dto.PreguntaFrecuente;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +14,9 @@ import java.util.LinkedHashSet;
 
 @Entity
 @Table(name = "cursos")
+// Writes only the columns that changed: an unreadable preguntas_frecuentes loads as an empty list, and a full-row
+// update after an unrelated change (a new review, a title edit) would otherwise overwrite it with null
+@DynamicUpdate
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,6 +42,12 @@ public class Curso {
 
     @Column(length = 500)
     private String introduccionTemario;
+
+    /** Ordered FAQ, stored as a JSON array in a nullable text column; never {@code null} once loaded from the database. */
+    @Convert(converter = PreguntasFrecuentesConverter.class)
+    @Column(columnDefinition = "TEXT")
+    @Builder.Default
+    private List<PreguntaFrecuente> preguntasFrecuentes = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String imagenUrl;

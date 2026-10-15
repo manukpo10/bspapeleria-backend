@@ -14,6 +14,7 @@ public class CursoResponse {
     private String descripcion;
     private String descripcionCorta;
     private String introduccionTemario;
+    private List<PreguntaFrecuente> preguntasFrecuentes;
     private String imagenUrl;
     private Double precio;
     private Double precioComparacion;

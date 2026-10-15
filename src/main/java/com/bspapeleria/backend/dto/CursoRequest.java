@@ -1,5 +1,6 @@
 package com.bspapeleria.backend.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -20,6 +21,11 @@ public class CursoRequest {
 
     @Size(max = 500, message = "La introducción del temario no puede superar los 500 caracteres")
     private String introduccionTemario;
+
+    /** {@code null} means "not sent" and keeps the stored list on update; a list, even empty, replaces it. */
+    @Valid
+    @Size(max = 20, message = "Un curso admite hasta 20 preguntas frecuentes")
+    private List<PreguntaFrecuente> preguntasFrecuentes;
 
     private String imagenUrl;
 

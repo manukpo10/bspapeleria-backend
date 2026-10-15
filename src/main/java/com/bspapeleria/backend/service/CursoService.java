@@ -87,6 +87,7 @@ public class CursoService {
                 .descripcion(request.getDescripcion())
                 .descripcionCorta(blankToNull(request.getDescripcionCorta()))
                 .introduccionTemario(blankToNull(request.getIntroduccionTemario()))
+                .preguntasFrecuentes(cleanPreguntas(request.getPreguntasFrecuentes()))
                 .imagenUrl(request.getImagenUrl())
                 .precio(request.getPrecio())
                 .precioComparacion(request.getPrecioComparacion())
@@ -122,6 +123,10 @@ public class CursoService {
         }
         if (request.getIntroduccionTemario() != null) {
             curso.setIntroduccionTemario(blankToNull(request.getIntroduccionTemario()));
+        }
+        // Same rule for the FAQ: no list means "not sent" and keeps the stored one; a list, even empty, replaces it
+        if (request.getPreguntasFrecuentes() != null) {
+            curso.setPreguntasFrecuentes(cleanPreguntas(request.getPreguntasFrecuentes()));
         }
         curso.setImagenUrl(request.getImagenUrl());
         curso.setPrecio(request.getPrecio());
@@ -193,6 +198,23 @@ public class CursoService {
         return recortado.isEmpty() ? null : recortado;
     }
 
+    /**
+     * Trims both texts of every question, drops the rows left empty (the admin may leave a blank row) and keeps the
+     * order. Always returns a new, mutable list, so the entity never shares it with the request.
+     */
+    private static List<PreguntaFrecuente> cleanPreguntas(List<PreguntaFrecuente> preguntas) {
+        List<PreguntaFrecuente> limpias = new ArrayList<>();
+        if (preguntas == null) return limpias;
+        for (PreguntaFrecuente p : preguntas) {
+            if (p == null) continue;
+            String pregunta = p.getPregunta() == null ? "" : p.getPregunta().trim();
+            String respuesta = p.getRespuesta() == null ? "" : p.getRespuesta().trim();
+            if (pregunta.isEmpty() && respuesta.isEmpty()) continue;
+            limpias.add(new PreguntaFrecuente(pregunta, respuesta));
+        }
+        return limpias;
+    }
+
     private Curso.Nivel parseNivel(String nivel) {
         if (nivel == null || nivel.isEmpty()) return Curso.Nivel.principiante;
         try {
@@ -248,6 +270,8 @@ public class CursoService {
                 .descripcion(curso.getDescripcion())
                 .descripcionCorta(curso.getDescripcionCorta())
                 .introduccionTemario(curso.getIntroduccionTemario())
+                .preguntasFrecuentes(curso.getPreguntasFrecuentes() != null
+                        ? new ArrayList<>(curso.getPreguntasFrecuentes()) : new ArrayList<>())
                 .imagenUrl(curso.getImagenUrl())
                 .precio(curso.getPrecio())
                 .precioComparacion(curso.getPrecioComparacion())

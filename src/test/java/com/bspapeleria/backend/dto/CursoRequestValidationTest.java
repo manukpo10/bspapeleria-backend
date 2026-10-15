@@ -11,7 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -90,5 +92,87 @@ class CursoRequestValidationTest {
         ConstraintViolation<CursoRequest> violation = violations.iterator().next();
         assertThat(violation.getPropertyPath()).hasToString("introduccionTemario");
         assertThat(violation.getMessage()).isEqualTo("La introducción del temario no puede superar los 500 caracteres");
+    }
+
+    // The FAQ list is stored as JSON in a text column, so the payload is bounded here instead: at most 20 items,
+    // each with a question of up to 300 characters and an answer of up to 2000.
+
+    private static CursoRequest requestWithFaqs(List<PreguntaFrecuente> preguntas) {
+        CursoRequest request = request(null);
+        request.setPreguntasFrecuentes(preguntas);
+        return request;
+    }
+
+    private static List<PreguntaFrecuente> faqs(int count) {
+        return IntStream.rangeClosed(1, count)
+                .mapToObj(i -> new PreguntaFrecuente("¿Pregunta " + i + "?", "Respuesta " + i))
+                .toList();
+    }
+
+    private static ConstraintViolation<CursoRequest> onlyViolationOf(CursoRequest request) {
+        Set<ConstraintViolation<CursoRequest>> violations = validator.validate(request);
+        assertThat(violations).hasSize(1);
+        return violations.iterator().next();
+    }
+
+    @Test
+    void faqListIsOptional() {
+        assertThat(validator.validate(requestWithFaqs(null))).isEmpty();
+        assertThat(validator.validate(requestWithFaqs(List.of()))).isEmpty();
+    }
+
+    @Test
+    void faqListOfExactlyTwentyItems_isValid() {
+        assertThat(validator.validate(requestWithFaqs(faqs(20)))).isEmpty();
+    }
+
+    @Test
+    void faqListOfTwentyOneItems_isRejectedWithASpanishMessage() {
+        ConstraintViolation<CursoRequest> violation = onlyViolationOf(requestWithFaqs(faqs(21)));
+
+        assertThat(violation.getPropertyPath()).hasToString("preguntasFrecuentes");
+        assertThat(violation.getMessage()).isEqualTo("Un curso admite hasta 20 preguntas frecuentes");
+    }
+
+    @Test
+    void faqWithABlankQuestion_isRejectedAndPointsAtTheItem() {
+        ConstraintViolation<CursoRequest> violation =
+                onlyViolationOf(requestWithFaqs(List.of(new PreguntaFrecuente("¿Ok?", "Ok"), new PreguntaFrecuente("   ", "Respuesta"))));
+
+        assertThat(violation.getPropertyPath()).hasToString("preguntasFrecuentes[1].pregunta");
+        assertThat(violation.getMessage()).isEqualTo("La pregunta es obligatoria");
+    }
+
+    @Test
+    void faqWithABlankAnswer_isRejectedAndPointsAtTheItem() {
+        ConstraintViolation<CursoRequest> violation =
+                onlyViolationOf(requestWithFaqs(List.of(new PreguntaFrecuente("¿Pregunta?", ""))));
+
+        assertThat(violation.getPropertyPath()).hasToString("preguntasFrecuentes[0].respuesta");
+        assertThat(violation.getMessage()).isEqualTo("La respuesta es obligatoria");
+    }
+
+    @Test
+    void faqQuestionAndAnswerAtTheirLimits_areValid() {
+        assertThat(validator.validate(requestWithFaqs(List.of(
+                new PreguntaFrecuente("a".repeat(300), "b".repeat(2000)))))).isEmpty();
+    }
+
+    @Test
+    void faqQuestionOverTheLimit_isRejectedWithASpanishMessage() {
+        ConstraintViolation<CursoRequest> violation =
+                onlyViolationOf(requestWithFaqs(List.of(new PreguntaFrecuente("a".repeat(301), "Respuesta"))));
+
+        assertThat(violation.getPropertyPath()).hasToString("preguntasFrecuentes[0].pregunta");
+        assertThat(violation.getMessage()).isEqualTo("La pregunta no puede superar los 300 caracteres");
+    }
+
+    @Test
+    void faqAnswerOverTheLimit_isRejectedWithASpanishMessage() {
+        ConstraintViolation<CursoRequest> violation =
+                onlyViolationOf(requestWithFaqs(List.of(new PreguntaFrecuente("¿Pregunta?", "b".repeat(2001)))));
+
+        assertThat(violation.getPropertyPath()).hasToString("preguntasFrecuentes[0].respuesta");
+        assertThat(violation.getMessage()).isEqualTo("La respuesta no puede superar los 2000 caracteres");
     }
 }
